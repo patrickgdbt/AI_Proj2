@@ -2,9 +2,27 @@ class Game:
     def __init__(self, recommend=True, n=3, b=0, s=3):
         self.initialize_game()
         self.recommend = recommend
-        self.n = n
-        self.b = b
-        self.s = s
+
+
+    def initialize_game(self):
+        valid = False
+        while (not valid):
+            self.n = input("Give a value n for the size of the board")
+            self.b = input("Give a value b for the amount of blocs to place on the board")
+        ##somewhere here we gotta ask for the coordinates that we want to put the "blocs" in
+            self.s = input("Give a value s for the amount of connecting positions must connect for a win")
+            if 3 <= self.n <= 10 and 0 < self.b <= 2 * self.n and 3 <= self.s <= self.n:
+                valid = True
+            print("The given values were not valid, make sure that the following conditions are met:")
+            print("n is an integer between 3 and 10 inclusive [3,...,10]")
+            print("b is an integer between 0 and 2n inclusive [0,...,2n]")
+            print("s is an integer between 3 and n inclusive [3,...,n]")
+            print("------------------------------------------------------------------------------------------")
+        self.current_state = [['.', '.', '.'],
+                              ['.', '.', '.'],
+                              ['.', '.', '.']]
+        # Player X always plays first
+        self.player_turn = 'X'
 
     def play(self, algo=None, player_x=None, player_o=None):
         if algo == None:
@@ -40,9 +58,10 @@ class Game:
         self.current_state[x][y] = self.player_turn
         self.switch_player()
 
+
 def main():
-    ##Ask the user to input an n, b, and s and send them into this constructor
     g = Game(recommend=True)
+
 
 if __name__ == "__main__":
     main()
