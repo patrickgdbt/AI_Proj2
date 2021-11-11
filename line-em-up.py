@@ -1,17 +1,28 @@
+import string
+
 class Game:
     def __init__(self, recommend=True, n=3, b=0, s=3):
-        self.initialize_game()
+        self.current_state = []
         self.recommend = recommend
-
+        self.blocks = []
+        self.n = 0
+        self.b = 0
+        self.s = 0
+        self.aDict = dict(zip(string.ascii_uppercase, range(0, 10)))
+        self.initialize_game()
 
     def initialize_game(self):
         valid = False
         while (not valid):
             self.n = int(input("Give a value n for the size of the board"))
             self.b = int(input("Give a value b for the amount of blocs to place on the board"))
-        ##somewhere here we gotta ask for the coordinates that we want to put the "blocs" in
             self.s = int(input("Give a value s for the amount of connecting positions must connect for a win"))
-            if 3 <= self.n <= 10 and 0 < self.b <= 2 * self.n and 3 <= self.s <= self.n:
+            for i in range(self.b):
+                x_str = input(f"Enter the column of the {i+1}th  block:")
+                x = self.aDict[x_str]
+                y = int(input(f"Enter the row of the {i+1}th  block:"))
+                self.blocks.append((x, y))
+            if 3 <= self.n <= 10 and 0 <= self.b <= 2 * self.n and 3 <= self.s <= self.n:
                 valid = True
             else:
                 print("The given values were not valid, make sure that the following conditions are met:")
@@ -19,11 +30,13 @@ class Game:
                 print("b is an integer between 0 and 2n inclusive [0,...,2n]")
                 print("s is an integer between 3 and n inclusive [3,...,n]")
             print("------------------------------------------------------------------------------------------")
-        self.current_state = [['.', '.', '.'],
-                              ['.', '.', '.'],
-                              ['.', '.', '.']]
-        # Player X always plays first
-        self.player_turn = 'X'
+        for i in range (self.n):
+            temp = []
+            for j in range(self.n):
+                temp.append('.')
+            self.current_state.append(temp)
+
+        self.player_turn = '◦'
 
     def play(self, algo=None, player_x=None, player_o=None):
         if algo == None:
