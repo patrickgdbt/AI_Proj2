@@ -8,6 +8,7 @@ class Game:
     AI = 3
     X_PLAYER = '◦'
     O_PLAYER = '•'
+    BLOCK = "☒"
 
     def __init__(self, recommend=True, n=3, b=0, s=3):
         self.current_state = []
@@ -45,17 +46,18 @@ class Game:
             self.current_state.append(temp)
 
         for block_coordinates in self.blocks:
-            self.current_state[block_coordinates[0]][block_coordinates[1]] = "☒"
+            self.current_state[block_coordinates[0]][block_coordinates[1]] = self.BLOCK
 
-        # self.n = 5
-        # self.s = 3
-        # self.b = 4
-        # test = [['☒', '◦', '.', '◦', '.'],
-        #         ['.', '☒', '.', '☒', '•'],
-        #         ['.', '•', '.', '◦', '.'],
-        #         ['.', '.', '.', '.', '.'],
-        #         ['.', '◦', '☒', '.', '•']]
-        # print(self.e1(test))
+        self.n = 5
+        self.s = 3
+        self.b = 4
+        test = [['☒', '◦', '.', '◦', '.'],
+                ['.', '☒', '.', '☒', '•'],
+                ['.', '•', '.', '◦', '.'],
+                ['.', '.', '.', '.', '.'],
+                ['.', '◦', '☒', '.', '•']]
+        print(self.e1(test))
+        print(self.e2(test))
 
         self.player_turn = self.X_PLAYER
 
@@ -67,20 +69,20 @@ class Game:
             print()
         print()
 
-    def get_submatrices(self):
+    def get_submatrices(self, state):
         slices = []
         for i in range(0, self.n - self.s + 1):
             for j in range(0, self.n - self.s + 1):
                 slices.append(
                     [
-                        [self.current_state[a][b] for b in range(j, j + self.s)]
+                        [state[a][b] for b in range(j, j + self.s)]
                         for a in range(i, i + self.s)
                     ]
                 )
         return slices
 
     def is_end(self):
-        sub_matrices = self.get_submatrices()
+        sub_matrices = self.get_submatrices(self.current_state)
         for sub in sub_matrices:
             # Diagonal win
             lr_diag = [row[i] for i, row in enumerate(sub)]
@@ -112,7 +114,7 @@ class Game:
 
     def is_sub_win(self, arr):
         items = set(arr)
-        if len(items) == 1 and "." not in items and "☒" not in items:
+        if len(items) == 1 and "." not in items and self.BLOCK not in items:
             return True, items.pop()
         return False, None
 
@@ -149,7 +151,7 @@ class Game:
                     total -= 1
 
         #diagonal
-        valid_diagonals = self.get_valid_diags(state)
+        valid_diagonals = self.get_valid_diags(state, self.s)
         for diagonal in valid_diagonals:
             for element in diagonal:
                 if element == self.X_PLAYER:
@@ -160,8 +162,44 @@ class Game:
         return total
 
     def e2(self, state):
+        possible_wins = []
+        score = 0
         # maximize for X_PLAYER
-        return
+        sub_matrices = self.get_submatrices(state)
+        for sub in sub_matrices:
+            # Diagonals
+            lr_diag = [row[i] for i, row in enumerate(sub)]
+            rl_diag = [row[-i - 1] for i, row in enumerate(sub)]
+            possible_wins.append(lr_diag)
+            possible_wins.append(rl_diag)
+
+        # Columns
+        columns = []
+        for i in range(self.n):
+            col = [row[i] for row in state]
+            columns.append(col)
+        for col in columns:
+            for i in range(self.n - self.s + 1):
+                baby_column = []
+                for j in range(i, i + self.s):
+                    baby_column.append(col[j])
+                possible_wins.append(baby_column)
+
+        # Rows
+        for row in state:
+            for i in range(self.n - self.s + 1):
+                baby_row = []
+                for j in range(i, i + self.s):
+                    baby_row.append(row[j])
+                possible_wins.append(baby_row)
+
+        for lst in possible_wins:
+            if self.X_PLAYER in lst and self.O_PLAYER not in lst and self.BLOCK not in lst:
+                score += lst.count(self.X_PLAYER)
+            elif self.O_PLAYER in lst or self.BLOCK in lst:
+                score -= 1
+
+        return score
 
     def play(self, algo=None, player_x=None, player_o=None):
         if algo == None:
@@ -206,14 +244,14 @@ class Game:
             self.player_turn = self.X_PLAYER
         return self.player_turn
 
-    def get_valid_diags(self, state):
+    def get_valid_diags(self, state, s):
         state = np.array(state)
         diags = [state[::-1, :].diagonal(i) for i in range(-state.shape[0] + 1, state.shape[1])]
         diags.extend(state.diagonal(i) for i in range(state.shape[1] - 1, -state.shape[0], -1))
         valid_diagonals = []
 
         for diag in diags:
-            if diag.shape[0] < self.s:
+            if diag.shape[0] < s:
                 continue
             valid_diagonals.append(diag)
 
