@@ -7,16 +7,17 @@ class Game:
     def initialize_game(self):
         valid = False
         while (not valid):
-            self.n = input("Give a value n for the size of the board")
-            self.b = input("Give a value b for the amount of blocs to place on the board")
+            self.n = int(input("Give a value n for the size of the board"))
+            self.b = int(input("Give a value b for the amount of blocs to place on the board"))
         ##somewhere here we gotta ask for the coordinates that we want to put the "blocs" in
-            self.s = input("Give a value s for the amount of connecting positions must connect for a win")
+            self.s = int(input("Give a value s for the amount of connecting positions must connect for a win"))
             if 3 <= self.n <= 10 and 0 < self.b <= 2 * self.n and 3 <= self.s <= self.n:
                 valid = True
-            print("The given values were not valid, make sure that the following conditions are met:")
-            print("n is an integer between 3 and 10 inclusive [3,...,10]")
-            print("b is an integer between 0 and 2n inclusive [0,...,2n]")
-            print("s is an integer between 3 and n inclusive [3,...,n]")
+            else:
+                print("The given values were not valid, make sure that the following conditions are met:")
+                print("n is an integer between 3 and 10 inclusive [3,...,10]")
+                print("b is an integer between 0 and 2n inclusive [0,...,2n]")
+                print("s is an integer between 3 and n inclusive [3,...,n]")
             print("------------------------------------------------------------------------------------------")
         self.current_state = [['.', '.', '.'],
                               ['.', '.', '.'],
@@ -61,7 +62,6 @@ class Game:
 
 def main():
     g = Game(recommend=True)
-
 
 if __name__ == "__main__":
     main()
