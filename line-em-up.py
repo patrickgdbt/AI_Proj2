@@ -1,6 +1,5 @@
 import string
-import numpy
-
+import numpy as np
 
 class Game:
     MINIMAX = 0
@@ -47,6 +46,16 @@ class Game:
 
         for block_coordinates in self.blocks:
             self.current_state[block_coordinates[0]][block_coordinates[1]] = "☒"
+
+        # self.n = 5
+        # self.s = 3
+        # self.b = 4
+        # test = [['☒', '◦', '.', '◦', '.'],
+        #         ['.', '☒', '.', '☒', '•'],
+        #         ['.', '•', '.', '◦', '.'],
+        #         ['.', '.', '.', '.', '.'],
+        #         ['.', '◦', '☒', '.', '•']]
+        # print(self.e1(test))
 
         self.player_turn = self.X_PLAYER
 
@@ -123,12 +132,32 @@ class Game:
     def e1(self, state):
         total = 0
         #row
+        for row in state:
+            for element in row:
+                if element == self.X_PLAYER:
+                    total += 1
+                if element == self.O_PLAYER:
+                    total -= 1
+
+        #column
         for i in range(self.n):
+            col = [row[i] for row in state]
+            for element in col:
+                if element == self.X_PLAYER:
+                    total += 1
+                if element == self.O_PLAYER:
+                    total -= 1
 
+        #diagonal
+        valid_diagonals = self.get_valid_diags(state)
+        for diagonal in valid_diagonals:
+            for element in diagonal:
+                if element == self.X_PLAYER:
+                    total += 1
+                if element == self.O_PLAYER:
+                    total -= 1
 
-        # maximize for X_PLAYER
-
-        return
+        return total
 
     def e2(self, state):
         # maximize for X_PLAYER
@@ -177,10 +206,22 @@ class Game:
             self.player_turn = self.X_PLAYER
         return self.player_turn
 
+    def get_valid_diags(self, state):
+        state = np.array(state)
+        diags = [state[::-1, :].diagonal(i) for i in range(-state.shape[0] + 1, state.shape[1])]
+        diags.extend(state.diagonal(i) for i in range(state.shape[1] - 1, -state.shape[0], -1))
+        valid_diagonals = []
+
+        for diag in diags:
+            if diag.shape[0] < self.s:
+                continue
+            valid_diagonals.append(diag)
+
+        return [n.tolist() for n in valid_diagonals]
+
 
 def main():
     g = Game(recommend=True)
-    g.play(algo=Game.ALPHABETA, player_x=Game.AI, player_o=Game.AI)
 
 
 if __name__ == "__main__":
