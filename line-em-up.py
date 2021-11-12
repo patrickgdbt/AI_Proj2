@@ -1,13 +1,18 @@
 import string
 import numpy as np
+import time
+
+debug = []
 
 class Game:
     MINIMAX = 0
     ALPHABETA = 1
     HUMAN = 2
     AI = 3
-    X_PLAYER = '◦'
-    O_PLAYER = '•'
+    #X_PLAYER = '◦'
+    #O_PLAYER = '•'
+    X_PLAYER = 'X'
+    O_PLAYER = 'O'
     BLOCK = "☒"
 
     def __init__(self, recommend=True, n=3, b=0, s=3):
@@ -17,7 +22,15 @@ class Game:
         self.n = 0
         self.b = 0
         self.s = 0
+        self.d1 = 0
+        self.d2 = 0
+        self.t = 0
+        self.alphabeta = self.ALPHABETA
+        self.p1 = self.HUMAN
+        self.p2 = self.HUMAN
+        self.recommend = True
         self.aDict = dict(zip(string.ascii_uppercase, range(0, 10)))
+        self.bDict = dict(zip(range(0,10), string.ascii_uppercase))
         self.initialize_game()
 
     def initialize_game(self):
@@ -26,6 +39,17 @@ class Game:
             self.n = int(input("Give a value n for the size of the board"))
             self.b = int(input("Give a value b for the amount of blocs to place on the board"))
             self.s = int(input("Give a value s for the amount of connecting positions must connect for a win"))
+            self.d1 = int(input("Give a value d1 for the max depth of the algorithms for player 1"))
+            self.d2 = int(input("Give a value d2 for the max depth of the algorithms for player 2"))
+            self.t = int(input("Give a value t for the max time the algorithms may take for finding a move:"))
+            self.alphabeta = int(input("Enter 1 to use alphabeta and enter 0 to use minimax"))
+            self.p1 = int(input("Enter 2 for player 1 to be human or 3 for player 1 to be AI"))
+            self.p2 = int(input("Enter 2 for player 2 to be human or 3 for player 2 to be AI"))
+            rec = int(input("Enter 0 to have recommendations off or 1 to have recommendations off"))
+            if rec == 0:
+                self.recommend = False
+            else:
+                self.recommend = True
             for i in range(self.b):
                 x_str = input(f"Enter the column of the {i + 1}th  block:")
                 x = self.aDict[x_str]
@@ -48,24 +72,13 @@ class Game:
         for block_coordinates in self.blocks:
             self.current_state[block_coordinates[0]][block_coordinates[1]] = self.BLOCK
 
-        self.n = 5
-        self.s = 3
-        self.b = 4
-        test = [['☒', '◦', '.', '◦', '.'],
-                ['.', '☒', '.', '☒', '•'],
-                ['.', '•', '.', '◦', '.'],
-                ['.', '.', '.', '.', '.'],
-                ['.', '◦', '☒', '.', '•']]
-        print(self.e1(test))
-        print(self.e2(test))
-
         self.player_turn = self.X_PLAYER
 
     def draw_board(self):
         print()
         for y in range(0, self.n):
             for x in range(0, self.n):
-                print(F'{self.current_state[x][y]}', end="")
+                print(F'{self.current_state[y][x]}', end="")
             print()
         print()
 
@@ -80,6 +93,14 @@ class Game:
                     ]
                 )
         return slices
+
+    def is_valid(self, px, py):
+        if px < 0 or px >= self.n or py < 0 or py >= self.n:
+            return False
+        elif self.current_state[px][py] != '.':
+            return False
+        else:
+            return True
 
     def is_end(self):
         sub_matrices = self.get_submatrices(self.current_state)
@@ -123,9 +144,9 @@ class Game:
         # Printing the appropriate message if the game has ended
         if self.result != None:
             if self.result == self.X_PLAYER:
-                print('The winner is ◦!')
+                print(f'The winner is {self.X_PLAYER}!')
             elif self.result == self.O_PLAYER:
-                print('The winner is •!')
+                print(f'The winner is {self.O_PLAYER}!')
             elif self.result == '.':
                 print("It's a tie!")
             self.initialize_game()
@@ -133,7 +154,8 @@ class Game:
 
     def e1(self, state):
         total = 0
-        #row
+
+        # row
         for row in state:
             for element in row:
                 if element == self.X_PLAYER:
@@ -141,7 +163,7 @@ class Game:
                 if element == self.O_PLAYER:
                     total -= 1
 
-        #column
+        # column
         for i in range(self.n):
             col = [row[i] for row in state]
             for element in col:
@@ -150,7 +172,7 @@ class Game:
                 if element == self.O_PLAYER:
                     total -= 1
 
-        #diagonal
+        # diagonal
         valid_diagonals = self.get_valid_diags(state, self.s)
         for diagonal in valid_diagonals:
             for element in diagonal:
@@ -194,12 +216,67 @@ class Game:
                 possible_wins.append(baby_row)
 
         for lst in possible_wins:
-            if self.X_PLAYER in lst and self.O_PLAYER not in lst and self.BLOCK not in lst:
-                score += lst.count(self.X_PLAYER)
-            elif self.O_PLAYER in lst or self.BLOCK in lst:
-                score -= 1
+            if self.O_PLAYER in lst and self.X_PLAYER not in lst and self.BLOCK not in lst and lst.count(
+                    self.O_PLAYER) == self.s:
+                return 1000
+            if self.X_PLAYER in lst and self.O_PLAYER not in lst and self.BLOCK not in lst and lst.count(
+                    self.X_PLAYER) == self.s:
+                return -1000
+            elif self.O_PLAYER in lst and self.X_PLAYER not in lst and self.BLOCK not in lst:
+                score += lst.count(self.O_PLAYER)
+            elif self.X_PLAYER in lst and self.O_PLAYER not in lst and self.BLOCK not in lst:
+                score -= lst.count(self.X_PLAYER)
 
         return score
+
+    def minimax(self, depth, maximum=False):
+        if maximum:
+            x = None
+            y = None
+            value = -10000
+            for i in range(self.n):
+                for j in range(self.n):
+                    if self.current_state[i][j] == '.':
+                        self.current_state[i][j] = self.player_turn
+                        if depth == 0 or self.is_terminal_node():
+                            v = self.e2(self.current_state)
+                            self.current_state[i][j] = '.'
+                            return (v, j, i)
+                        (v, _, _) = self.minimax(depth-1, False)
+                        if v > value:
+                            x = j
+                            y = i
+                            value = v
+                        self.current_state[i][j] = '.'
+            return (value, x, y)
+        else:
+            x = None
+            y = None
+            value = 10000
+            for i in range(self.n):
+                for j in range(self.n):
+                    if self.current_state[i][j] == '.':
+                        self.current_state[i][j] = self.player_turn
+                        if depth == 0 or self.is_terminal_node():
+                            v = self.e2(self.current_state)
+                            self.current_state[i][j] = '.'
+                            return (v, j, i)
+                        (v, _, _) = self.minimax(depth - 1, True)
+                        if v < value:
+                            x = j
+                            y = i
+                            value = v
+                        self.current_state[i][j] = '.'
+            return (value, x, y)
+
+    def is_terminal_node(self):
+        full = True
+        for row in self.current_state:
+            if '.' in row:
+                full = False
+
+        return full
+
 
     def play(self, algo=None, player_x=None, player_o=None):
         if algo == None:
@@ -212,30 +289,41 @@ class Game:
             self.draw_board()
             if self.check_end():
                 return
-        start = time.time()
-        if algo == self.MINIMAX:
-            if self.player_turn == self.X_PLAYER:
-                (_, x, y) = self.minimax(max=False)
-            else:
-                (_, x, y) = self.minimax(max=True)
-        else:  # algo == self.ALPHABETA
-            if self.player_turn == self.X_PLAYER:
-                (m, x, y) = self.alphabeta(max=False)
-            else:
-                (m, x, y) = self.alphabeta(max=True)
-        end = time.time()
-        if (self.player_turn == self.X_PLAYER and player_x == self.HUMAN) or (
-                self.player_turn == '•' and player_o == self.HUMAN):
-            if self.recommend:
+            start = time.time()
+            if algo == self.MINIMAX:
+                if self.player_turn == self.X_PLAYER:
+                    (_, x, y) = self.minimax(self.d1, maximum=False)
+                else:
+                    (_, x, y) = self.minimax(self.d2, maximum=True)
+            else:  # algo == self.ALPHABETA
+                if self.player_turn == self.X_PLAYER:
+                    (m, x, y) = self.alphabeta(maximum=False)
+                else:
+                    (m, x, y) = self.alphabeta(maximum=True)
+            end = time.time()
+            if (self.player_turn == self.X_PLAYER and player_x == self.HUMAN) or (
+                    self.player_turn == self.O_PLAYER and player_o == self.HUMAN):
+                if self.recommend:
+                    print(F'Evaluation time: {round(end - start, 7)}s')
+                    print(F'Recommended move: x = {self.bDict[x]}, y = {y}')
+                (x, y) = self.input_move()
+            if (self.player_turn == self.X_PLAYER and player_x == self.AI) or (
+                    self.player_turn == self.O_PLAYER and player_o == self.AI):
                 print(F'Evaluation time: {round(end - start, 7)}s')
-                print(F'Recommended move: x = {x}, y = {y}')
-            (x, y) = self.input_move()
-        if (self.player_turn == self.X_PLAYER and player_x == self.AI) or (
-                self.player_turn == '•' and player_o == self.AI):
-            print(F'Evaluation time: {round(end - start, 7)}s')
-            print(F'Player {self.player_turn} under AI control plays: x = {x}, y = {y}')
-        self.current_state[x][y] = self.player_turn
-        self.switch_player()
+                print(F'Player {self.player_turn} under AI control plays: x = {self.bDict[x]}, y = {y}')
+            self.current_state[x][y] = self.player_turn
+            self.switch_player()
+
+    def input_move(self):
+        while True:
+            print(F'Player {self.player_turn}, enter your move:')
+            x_str = input('enter the x coordinate: ')
+            px = self.aDict[x_str]
+            py = int(input('enter the y coordinate: '))
+            if self.is_valid(py, px):
+                return (py, px)
+            else:
+                print('The move is not valid! Try again.')
 
     def switch_player(self):
         if self.player_turn == self.X_PLAYER:
@@ -260,6 +348,7 @@ class Game:
 
 def main():
     g = Game(recommend=True)
+    g.play(algo=g.alphabeta, player_x=g.p1, player_o=g.p2)
 
 
 if __name__ == "__main__":
