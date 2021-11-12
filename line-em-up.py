@@ -13,7 +13,7 @@ class Game:
     #O_PLAYER = '•'
     X_PLAYER = 'X'
     O_PLAYER = 'O'
-    BLOCK = "☒"
+    BLOCK = "-"
 
     def __init__(self, recommend=True, n=3, b=0, s=3):
         self.current_state = []
