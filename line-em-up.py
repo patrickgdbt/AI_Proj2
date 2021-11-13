@@ -25,7 +25,6 @@ class Game:
         self.d1 = 0
         self.d2 = 0
         self.t = 0
-        self.alphabeta = self.ALPHABETA
         self.p1 = self.HUMAN
         self.p2 = self.HUMAN
         self.recommend = True
@@ -42,7 +41,6 @@ class Game:
             self.d1 = int(input("Give a value d1 for the max depth of the algorithms for player 1"))
             self.d2 = int(input("Give a value d2 for the max depth of the algorithms for player 2"))
             self.t = int(input("Give a value t for the max time the algorithms may take for finding a move:"))
-            self.alphabeta = int(input("Enter 1 to use alphabeta and enter 0 to use minimax"))
             self.p1 = int(input("Enter 2 for player 1 to be human or 3 for player 1 to be AI"))
             self.p2 = int(input("Enter 2 for player 2 to be human or 3 for player 2 to be AI"))
             rec = int(input("Enter 0 to have recommendations off or 1 to have recommendations off"))
@@ -229,6 +227,61 @@ class Game:
 
         return score
 
+    def alphabeta(self, depth, a, b, maximum=False):
+        escape_everything = False;
+        if maximum:
+            x = None
+            y = None
+            value = -10000
+            for i in range(self.n):
+                for j in range(self.n):
+                    if self.current_state[i][j] == '.':
+                        self.current_state[i][j] = self.player_turn
+                        if depth == 0 or self.is_terminal_node():
+                            v = self.e2(self.current_state)
+                            self.current_state[i][j] = '.'
+                            return (v, j, i)
+                        (v, _, _) = self.alphabeta(depth-1, a, b, False)
+                        if v > value:
+                            x = j
+                            y = i
+                            value = v
+                        a = max(a, value)
+                        if a >= b:
+                            self.current_state[i][j] = '.'
+                            escape_everything = True
+                            break
+                        self.current_state[i][j] = '.'
+                if escape_everything:
+                    break
+            return (value, x, y)
+        else:
+            x = None
+            y = None
+            value = 10000
+            for i in range(self.n):
+                for j in range(self.n):
+                    if self.current_state[i][j] == '.':
+                        self.current_state[i][j] = self.player_turn
+                        if depth == 0 or self.is_terminal_node():
+                            v = self.e2(self.current_state)
+                            self.current_state[i][j] = '.'
+                            return (v, j, i)
+                        (v, _, _) = self.alphabeta(depth-1, a, b, True)
+                        if v < value:
+                            x = j
+                            y = i
+                            value = v
+                        b = min(b, value)
+                        if b <= a:
+                            self.current_state[i][j] = '.'
+                            escape_everything = True
+                            break
+                        self.current_state[i][j] = '.'
+                if escape_everything:
+                    break
+            return (value, x, y)
+
     def minimax(self, depth, maximum=False):
         if maximum:
             x = None
@@ -277,7 +330,6 @@ class Game:
 
         return full
 
-
     def play(self, algo=None, player_x=None, player_o=None):
         if algo == None:
             algo = self.ALPHABETA
@@ -297,9 +349,9 @@ class Game:
                     (_, x, y) = self.minimax(self.d2, maximum=True)
             else:  # algo == self.ALPHABETA
                 if self.player_turn == self.X_PLAYER:
-                    (m, x, y) = self.alphabeta(maximum=False)
+                    (m, x, y) = self.alphabeta(self.d1, -1000000, 1000000, maximum=False)
                 else:
-                    (m, x, y) = self.alphabeta(maximum=True)
+                    (m, x, y) = self.alphabeta(self.d2, -1000000, 1000000, maximum=True)
             end = time.time()
             if (self.player_turn == self.X_PLAYER and player_x == self.HUMAN) or (
                     self.player_turn == self.O_PLAYER and player_o == self.HUMAN):
