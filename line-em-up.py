@@ -307,11 +307,12 @@ class Game:
                     print(F'Evaluation time: {round(end - start, 7)}s')
                     print(F'Recommended move: x = {self.bDict[x]}, y = {y}')
                 (x, y) = self.input_move()
+                self.current_state[x][y] = self.player_turn
             if (self.player_turn == self.X_PLAYER and player_x == self.AI) or (
                     self.player_turn == self.O_PLAYER and player_o == self.AI):
                 print(F'Evaluation time: {round(end - start, 7)}s')
                 print(F'Player {self.player_turn} under AI control plays: x = {self.bDict[x]}, y = {y}')
-            self.current_state[x][y] = self.player_turn
+                self.current_state[y][x] = self.player_turn
             self.switch_player()
 
     def input_move(self):
