@@ -15,23 +15,29 @@ class Game:
     O_PLAYER = 'O'
     BLOCK = "-"
 
-    def __init__(self, recommend=True, n=3, b=0, s=3):
+    def __init__(self, recommend=True, n=3, b=0, s=3, d1=5, d2=5, t=5, blocks=[], a1=True, a2=True):
         self.current_state = []
         self.recommend = recommend
-        self.blocks = []
-        self.n = 0
-        self.b = 0
-        self.s = 0
-        self.d1 = 0
-        self.d2 = 0
-        self.t = 0
-        self.p1 = self.HUMAN
-        self.p2 = self.HUMAN
-        self.algo1 = self.MINIMAX
-        self.algo2 = self.MINIMAX
+        self.blocks = blocks
+        self.n = n
+        self.b = b
+        self.s = s
+        self.d1 = d1
+        self.d2 = d2
+        self.t = t
+        self.p1 = self.AI
+        self.p2 = self.AI
+        if a1:
+            self.algo1 = self.ALPHABETA
+        else:
+            self.algo1 = self.MINIMAX
+        if a2:
+            self.algo2 = self.ALPHABETA
+        else:
+            self.algo2 = self.MINIMAX
         self.recommend = True
         self.heuristic1 = 1
-        self.heuristic2 = 1
+        self.heuristic2 = 2
         self.time_heuristic1 = []
         self.time_heuristic2 = []
         self.count_heuristic1 = 0
@@ -49,6 +55,21 @@ class Game:
         self.initialize_game()
 
     def initialize_game(self):
+        if(False):
+            self.get_console_input()
+
+        for i in range(self.n):
+            temp = []
+            for j in range(self.n):
+                temp.append('.')
+            self.current_state.append(temp)
+
+        for block_coordinates in self.blocks:
+            self.current_state[block_coordinates[0]][block_coordinates[1]] = self.BLOCK
+
+        self.player_turn = self.X_PLAYER
+
+    def get_console_input(self):
         valid = False
         while (not valid):
             self.n = int(input("Give a value n for the size of the board"))
@@ -81,16 +102,6 @@ class Game:
                 print("b is an integer between 0 and 2n inclusive [0,...,2n]")
                 print("s is an integer between 3 and n inclusive [3,...,n]")
             print("------------------------------------------------------------------------------------------")
-        for i in range(self.n):
-            temp = []
-            for j in range(self.n):
-                temp.append('.')
-            self.current_state.append(temp)
-
-        for block_coordinates in self.blocks:
-            self.current_state[block_coordinates[0]][block_coordinates[1]] = self.BLOCK
-
-        self.player_turn = self.X_PLAYER
 
     def draw_board(self):
         print()
@@ -407,152 +418,162 @@ class Game:
 
         return full
 
-    def play(self, f):
-        while True:
-            self.draw_board()
-            if self.check_end(f):
-                if len(self.time_heuristic1) != 0:
-                    f.write(f"6b i) The average time for heuristic 1 was: {sum(self.time_heuristic1)/len(self.time_heuristic1)} \n")
+    def play(self):
+        with open(f"gameTrace-{self.n}{self.b}{self.s}{self.t}.txt", "w+") as f:
+            self.inital_parameters_to_file(f)
+            while True:
+                self.draw_board()
+                if self.check_end(f):
+                    self.end_of_game_metrics_to_file(f)
+                    return
+                start = time.time()
+                if self.player_turn == self.X_PLAYER:
+                    if self.algo1 == self.MINIMAX:
+                        (_, x, y) = self.minimax(self.d1, self.heuristic1, maximum=False)
+                    else:
+                        (m, x, y) = self.alphabeta(self.d1, -1000000, 1000000, self.heuristic1, maximum=False)
                 else:
-                    f.write(f"6b i) The average time for heuristic 1 was: 0 as it was not used \n")
-                if len(self.time_heuristic2) != 0:
-                    f.write(f" The average time for heuristic 2 was: {sum(self.time_heuristic2) / len(self.time_heuristic2)} \n")
-                else:
-                    f.write(f"The average time for heuristic 2 was: 0 as it was not used \n")
+                    if self.algo2 == self.MINIMAX:
+                        (_, x, y) = self.minimax(self.d2, self.heuristic2, maximum=True)
+                    else:
+                        (m, x, y) = self.alphabeta(self.d2, -1000000, 1000000, self.heuristic2, maximum=True)
+                end = time.time()
 
-                f.write(f"6b ii) Heuristic 1 evaluated {self.count_heuristic1} nodes and heuristic 2 evaluated {self.count_heuristic2} nodes\n")
+                if (self.player_turn == self.X_PLAYER and self.p1 == self.HUMAN) or (
+                        self.player_turn == self.O_PLAYER and self.p2 == self.HUMAN):
+                    if self.recommend:
+                        print(F'Evaluation time: {round(end - start, 7)}s')
+                        print(F'Recommended move: x = {self.bDict[x]}, y = {y}')
+                    (x, y) = self.input_move()
 
-                if len(self.per_move_average_1) != 0:
-                    f.write(f"6b iii) The average of the per-move average depth of the heuristic evaluation for heuristic 1 is {sum(self.per_move_average_1)/len(self.per_move_average_1)} \n")
-                else:
-                    f.write(f"6b iii) The average of the per-move average depth of the heuristic evaluation for heuristic 1 is 0 as it was not used \n")
-                if len(self.per_move_average_2) != 0:
-                    f.write(f"The average of the per-move average depth of the heuristic evaluation for heuristic 2 is {sum(self.per_move_average_2) / len(self.per_move_average_2)} \n")
-                else:
-                    f.write(f"The average of the per-move average depth of the heuristic evaluation for heuristic 2 is 0 as it was not used \n")
+                    self.per_turn_metrics_to_file(end, f, start, x, y)
 
-                f.write("6b iv) The total number of states evaluated at each depth for heuristic 1: \n")
-                for depth in self.total_depth_1:
-                    f.write(f"Depth {depth} : {self.total_depth_1[depth]}\n")
-                f.write("The total number of states evaluated at each depth for heuristic 2: \n")
-                for depth in self.total_depth_2:
-                    f.write(f"Depth {depth} : {self.total_depth_2[depth]}\n")
-
-                f.write(f"6b vi) The total number of moves made by heuristic 1 is {self.total_moves_1} and the total number of moves made by heuristic 2 is {self.total_moves_2}\n")
-                return
-            start = time.time()
-            if self.player_turn == self.X_PLAYER:
-                if self.algo1 == self.MINIMAX:
-                    (_, x, y) = self.minimax(self.d1, self.heuristic1, maximum=False)
-                else:
-                    (m, x, y) = self.alphabeta(self.d1, -1000000, 1000000, self.heuristic1, maximum=False)
-            else:
-                if self.algo2 == self.MINIMAX:
-                    (_, x, y) = self.minimax(self.d2, self.heuristic2, maximum=True)
-                else:
-                    (m, x, y) = self.alphabeta(self.d2, -1000000, 1000000, self.heuristic2, maximum=True)
-            end = time.time()
-
-            if (self.player_turn == self.X_PLAYER and self.p1 == self.HUMAN) or (
-                    self.player_turn == self.O_PLAYER and self.p2 == self.HUMAN):
-                if self.recommend:
+                    self.current_state[x][y] = self.player_turn
+                if (self.player_turn == self.X_PLAYER and self.p1 == self.AI) or (
+                        self.player_turn == self.O_PLAYER and self.p2 == self.AI):
                     print(F'Evaluation time: {round(end - start, 7)}s')
-                    print(F'Recommended move: x = {self.bDict[x]}, y = {y}')
-                (x, y) = self.input_move()
+                    print(F'Player {self.player_turn} under AI control plays: x = {self.bDict[x]}, y = {y}')
 
-                if self.player_turn == self.X_PLAYER and self.heuristic1 == 1:
-                    self.total_moves_1 += 1
-                elif self.player_turn == self.X_PLAYER and self.heuristic1 == 2:
-                    self.total_moves_2 += 1
-                elif self.player_turn == self.O_PLAYER and self.heuristic2 == 1:
-                    self.total_moves_1 += 1
-                elif self.player_turn == self.O_PLAYER and self.heuristic2 == 2:
-                    self.total_moves_2 += 1
+                    self.per_turn_metrics_to_file(end, f, start, x, y)
+                    self.current_state[y][x] = self.player_turn
+                self.switch_player()
 
-                f.write(f"5.a) Move taken: (x,y) = ({self.bDict[x]},{y})\n")
+    def per_turn_metrics_to_file(self, end, f, start, x, y):
+        if self.player_turn == self.X_PLAYER and self.heuristic1 == 1:
+            self.total_moves_1 += 1
+        elif self.player_turn == self.X_PLAYER and self.heuristic1 == 2:
+            self.total_moves_2 += 1
+        elif self.player_turn == self.O_PLAYER and self.heuristic2 == 1:
+            self.total_moves_1 += 1
+        elif self.player_turn == self.O_PLAYER and self.heuristic2 == 2:
+            self.total_moves_2 += 1
+        f.write(f"5.a) Move taken: (x,y) = ({self.bDict[x]},{y})\n")
+        f.write("5.b)")
+        self.draw_board_to_file(f)
+        f.write(f"5.c i) The evaluation time was: {round(end - start, 7)}s \n")
+        f.write(f"5.c ii) The number of states evaluated by the heuristic function is {self.visited}\n")
+        self.visited = 0
+        f.write(f"5 c iii) the number of nodes visited at each depth is: \n")
+        numerator = 0
+        denominator = 0
+        for depth in self.depthVisits:
+            f.write(f"Depth {depth}: {self.depthVisits[depth]}\n")
 
-                f.write("5.b)")
-                self.draw_board_to_file(f)
+            if self.player_turn == self.X_PLAYER and self.heuristic1 == 1:
+                if depth not in self.total_depth_1:
+                    self.total_depth_1[depth] = self.depthVisits[depth]
+                else:
+                    self.total_depth_1[depth] += self.depthVisits[depth]
+            elif self.player_turn == self.X_PLAYER and self.heuristic1 == 2:
+                if depth not in self.total_depth_2:
+                    self.total_depth_2[depth] = self.depthVisits[depth]
+                else:
+                    self.total_depth_2[depth] += self.depthVisits[depth]
+            elif self.player_turn == self.O_PLAYER and self.heuristic2 == 1:
+                if depth not in self.total_depth_1:
+                    self.total_depth_1[depth] = self.depthVisits[depth]
+                else:
+                    self.total_depth_1[depth] += self.depthVisits[depth]
+            elif self.player_turn == self.O_PLAYER and self.heuristic2 == 2:
+                if depth not in self.total_depth_2:
+                    self.total_depth_2[depth] = self.depthVisits[depth]
+                else:
+                    self.total_depth_2[depth] += self.depthVisits[depth]
 
-                f.write(f"5.c i) The evaluation time was: {round(end - start, 7)}s \n")
+            numerator += self.depthVisits[depth] * depth
+            denominator += self.depthVisits[depth]
+        f.write(f"5.c iv) The average depth is {numerator / denominator} \n")
+        if self.player_turn == self.X_PLAYER and self.heuristic1 == 1:
+            self.per_move_average_1.append(numerator / denominator)
+        elif self.player_turn == self.X_PLAYER and self.heuristic1 == 2:
+            self.per_move_average_2.append(numerator / denominator)
+        elif self.player_turn == self.O_PLAYER and self.heuristic2 == 1:
+            self.per_move_average_1.append(numerator / denominator)
+        elif self.player_turn == self.O_PLAYER and self.heuristic2 == 2:
+            self.per_move_average_2.append(numerator / denominator)
+        self.depthVisits = {}
 
-                f.write(f"5.c ii) The number of states evaluated by the heuristic function is {self.visited}\n")
-                self.visited = 0
+    def end_of_game_metrics_to_file(self, f):
+        if len(self.time_heuristic1) != 0:
+            f.write(
+                f"6b i) The average time for heuristic 1 was: {sum(self.time_heuristic1) / len(self.time_heuristic1)} \n")
+        else:
+            f.write(f"6b i) The average time for heuristic 1 was: 0 as it was not used \n")
+        if len(self.time_heuristic2) != 0:
+            f.write(
+                f" The average time for heuristic 2 was: {sum(self.time_heuristic2) / len(self.time_heuristic2)} \n")
+        else:
+            f.write(f"The average time for heuristic 2 was: 0 as it was not used \n")
+        f.write(
+            f"6b ii) Heuristic 1 evaluated {self.count_heuristic1} nodes and heuristic 2 evaluated {self.count_heuristic2} nodes\n")
+        if len(self.per_move_average_1) != 0:
+            f.write(
+                f"6b iii) The average of the per-move average depth of the heuristic evaluation for heuristic 1 is {sum(self.per_move_average_1) / len(self.per_move_average_1)} \n")
+        else:
+            f.write(
+                f"6b iii) The average of the per-move average depth of the heuristic evaluation for heuristic 1 is 0 as it was not used \n")
+        if len(self.per_move_average_2) != 0:
+            f.write(
+                f"The average of the per-move average depth of the heuristic evaluation for heuristic 2 is {sum(self.per_move_average_2) / len(self.per_move_average_2)} \n")
+        else:
+            f.write(
+                f"The average of the per-move average depth of the heuristic evaluation for heuristic 2 is 0 as it was not used \n")
+        f.write("6b iv) The total number of states evaluated at each depth for heuristic 1: \n")
+        for depth in self.total_depth_1:
+            f.write(f"Depth {depth} : {self.total_depth_1[depth]}\n")
+        f.write("The total number of states evaluated at each depth for heuristic 2: \n")
+        for depth in self.total_depth_2:
+            f.write(f"Depth {depth} : {self.total_depth_2[depth]}\n")
+        f.write(
+            f"6b vi) The total number of moves made by heuristic 1 is {self.total_moves_1} and the total number of moves made by heuristic 2 is {self.total_moves_2}\n")
 
-                f.write(f"5 c iii) the number of nodes visited at each depth is: \n")
-                numerator = 0
-                denominator = 0
-
-                for depth in self.depthVisits:
-                    f.write(f"Depth {depth}: {self.depthVisits[depth]}\n")
-                    if self.player_turn == self.X_PLAYER and self.heuristic1 == 1:
-                        if depth not in self.total_depth_1:
-                            self.total_depth_1[depth] = self.depthVisits[depth]
-                        else:
-                            self.total_depth_1[depth] += self.depthVisits[depth]
-                    elif self.player_turn == self.X_PLAYER and self.heuristic1 == 2:
-                        if depth not in self.total_depth_2:
-                            self.total_depth_2[depth] = self.depthVisits[depth]
-                        else:
-                            self.total_depth_2[depth] += self.depthVisits[depth]
-                    elif self.player_turn == self.O_PLAYER and self.heuristic2 == 1:
-                        if depth not in self.total_depth_1:
-                            self.total_depth_1[depth] = self.depthVisits[depth]
-                        else:
-                            self.total_depth_1[depth] += self.depthVisits[depth]
-                    elif self.player_turn == self.O_PLAYER and self.heuristic2 == 2:
-                        if depth not in self.total_depth_2:
-                            self.total_depth_2[depth] = self.depthVisits[depth]
-                        else:
-                            self.total_depth_2[depth] += self.depthVisits[depth]
-
-                    numerator += self.depthVisits[depth] * depth
-                    denominator += self.depthVisits[depth]
-                f.write(f"5.c iv) The average depth is {numerator/denominator} \n")
-
-                if self.player_turn == self.X_PLAYER and self.heuristic1 == 1:
-                    self.per_move_average_1.append(numerator/denominator)
-                elif self.player_turn == self.X_PLAYER and self.heuristic1 == 2:
-                    self.per_move_average_2.append(numerator/denominator)
-                elif self.player_turn == self.O_PLAYER and self.heuristic2 == 1:
-                    self.per_move_average_1.append(numerator/denominator)
-                elif self.player_turn == self.O_PLAYER and self.heuristic2 == 2:
-                    self.per_move_average_2.append(numerator/denominator)
-
-                self.depthVisits = {}
-
-                self.current_state[x][y] = self.player_turn
-            if (self.player_turn == self.X_PLAYER and self.p1 == self.AI) or (
-                    self.player_turn == self.O_PLAYER and self.p2 == self.AI):
-                print(F'Evaluation time: {round(end - start, 7)}s')
-                print(F'Player {self.player_turn} under AI control plays: x = {self.bDict[x]}, y = {y}')
-
-                if self.player_turn == self.X_PLAYER and self.heuristic1 == 1:
-                    self.total_moves_1 += 1
-                elif self.player_turn == self.X_PLAYER and self.heuristic1 == 2:
-                    self.total_moves_2 += 1
-                elif self.player_turn == self.O_PLAYER and self.heuristic2 == 1:
-                    self.total_moves_1 += 1
-                elif self.player_turn == self.O_PLAYER and self.heuristic2 == 2:
-                    self.total_moves_2 += 1
-
-                f.write(f"5.a) Move taken: (x,y) = ({self.bDict[x]},{y})\n")
-                f.write("5.b)")
-                self.draw_board_to_file(f)
-                f.write(f"5.c i) The evaluation time was: {round(end - start, 7)}s \n")
-                f.write(f"5.c ii) The number of states evaluated by the heuristic function is {self.visited}\n")
-                self.visited = 0
-                f.write(f"5 c iii) the number of nodes visited at each depth is: \n")
-                numerator = 0
-                denominator = 0
-                for depth in self.depthVisits:
-                    f.write(f"Depth {depth}: {self.depthVisits[depth]}\n")
-                    numerator += self.depthVisits[depth] * depth
-                    denominator += self.depthVisits[depth]
-                f.write(f"5.c iv) The average depth is {numerator / denominator} \n")
-                self.depthVisits = {}
-                self.current_state[y][x] = self.player_turn
-            self.switch_player()
+    def inital_parameters_to_file(self, f):
+        f.write(f"1. The size n of the board is {self.n}, the number of blocks b is {self.b}, "
+                f"the number of connected pieces s is {self.s} and the maximum time for evaluation t is {self.t} \n")
+        f.write("2. The positions of the blocks are: \n")
+        for block in self.blocks:
+            f.write(f"(x,y) = ({self.bDict[block[1]]}, {block[0]})\n")
+        f.write("3. Player configurations:\n")
+        if self.p1 == self.HUMAN:
+            f.write("Player 1 is human.\n")
+        else:
+            if self.algo1 == self.MINIMAX:
+                f.write(
+                    f"Player 1 is an AI. The maximum depth is {self.d1}. The algorithm is minimax and the heuristic used was heuristic {self.heuristic1}\n")
+            else:
+                f.write(
+                    f"Player 1 is an AI. The maximum depth is {self.d1}. The algorithm is alphabeta and the heuristic used was heuristic {self.heuristic1}\n")
+        if self.p2 == self.HUMAN:
+            f.write("Player 2 is human.\n")
+        else:
+            if self.algo2 == self.MINIMAX:
+                f.write(
+                    f"Player 2 is an AI. The maximum depth is {self.d2}. The algorithm is minimax and the heuristic used was heuristic {self.heuristic2}\n")
+            else:
+                f.write(
+                    f"Player 2 is an AI. The maximum depth is {self.d2}. The algorithm is alphabeta and the heuristic used was heuristic {self.heuristic2}\n")
+        f.write("4. The initial game board:\n")
+        self.draw_board_to_file(f)
 
     def input_move(self):
         while True:
@@ -587,41 +608,8 @@ class Game:
 
 
 def main():
-    g = Game(recommend=True)
-
-    with open(f"gameTrace-{g.n}{g.b}{g.s}{g.t}.txt", "w+") as f:
-        f.write(f"1. The size n of the board is {g.n}, the number of blocks b is {g.b}, "
-                f"the number of connected pieces s is {g.s} and the maximum time for evaluation t is {g.t} \n")
-        f.write("2. The positions of the blocks are: \n")
-        for block in g.blocks:
-            f.write(f"(x,y) = ({g.bDict[block[1]]}, {block[0]})\n")
-
-        f.write("3. Player configurations:\n")
-        if g.p1 == g.HUMAN:
-            f.write("Player 1 is human.\n")
-        else:
-            if g.algo1 == g.MINIMAX:
-                f.write(
-                    f"Player 1 is an AI. The maximum depth is {g.d1}. The algorithm is minimax and the heuristic used was heuristic {g.heuristic1}\n")
-            else:
-                f.write(
-                    f"Player 1 is an AI. The maximum depth is {g.d1}. The algorithm is alphabeta and the heuristic used was heuristic {g.heuristic1}\n")
-
-        if g.p2 == g.HUMAN:
-            f.write("Player 2 is human.\n")
-        else:
-            if g.algo2 == g.MINIMAX:
-                f.write(
-                    f"Player 2 is an AI. The maximum depth is {g.d2}. The algorithm is minimax and the heuristic used was heuristic {g.heuristic2}\n")
-            else:
-                f.write(
-                    f"Player 2 is an AI. The maximum depth is {g.d2}. The algorithm is alphabeta and the heuristic used was heuristic {g.heuristic2}\n")
-
-        f.write("4. The initial game board:\n")
-        g.draw_board_to_file(f)
-
-        g.play(f)
-
+    g = Game(n=4, b=4, s=3, t=1, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], a1=True, a2=True, recommend=True)
+    g.play()
 
 if __name__ == "__main__":
     main()
