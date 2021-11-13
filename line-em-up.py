@@ -1,22 +1,26 @@
 import string
 import numpy as np
 import time
+import random
 
 debug = []
+
 
 class Game:
     MINIMAX = 0
     ALPHABETA = 1
     HUMAN = 2
     AI = 3
-    #X_PLAYER = '◦'
-    #O_PLAYER = '•'
+    # X_PLAYER = '◦'
+    # O_PLAYER = '•'
     X_PLAYER = 'X'
     O_PLAYER = 'O'
     BLOCK = "-"
 
-    def __init__(self, recommend=True, n=3, b=0, s=3, d1=5, d2=5, t=5, blocks=[], a1=True, a2=True):
+    def __init__(self, recommend=True, n=3, b=0, s=3, d1=5, d2=5, t=5, blocks=[], a1=True, a2=True,
+                 random_blocks=False):
         self.current_state = []
+        self.random_blocks = random_blocks
         self.recommend = recommend
         self.blocks = blocks
         self.n = n
@@ -55,8 +59,17 @@ class Game:
         self.initialize_game()
 
     def initialize_game(self):
-        if(False):
+        if (False):
             self.get_console_input()
+
+        if self.random_blocks:
+            random_blocks = []
+            for i in range(self.b):
+                current_block = None
+                while current_block not in random_blocks:
+                    current_block = (random.randint(0, self.n - 1), random.randint(0, self.n - 1))
+                    random_blocks.append(current_block)
+            self.blocks = random_blocks
 
         for i in range(self.n):
             temp = []
@@ -92,8 +105,10 @@ class Game:
                 self.recommend = False
             else:
                 self.recommend = True
-            self.heuristic1 = int(input("Enter 1 to use heuristic 1 for player 1 and enter 2 to use heuristic 2 for player 1:"))
-            self.heuristic2 = int(input("Enter 1 to use heuristic 1 for player 2 and enter 2 to use heuristic 2 for player 2:"))
+            self.heuristic1 = int(
+                input("Enter 1 to use heuristic 1 for player 1 and enter 2 to use heuristic 2 for player 1:"))
+            self.heuristic2 = int(
+                input("Enter 1 to use heuristic 1 for player 2 and enter 2 to use heuristic 2 for player 2:"))
             if 3 <= self.n <= 10 and 0 <= self.b <= 2 * self.n and 3 <= self.s <= self.n:
                 valid = True
             else:
@@ -176,7 +191,7 @@ class Game:
             return True, items.pop()
         return False, None
 
-    def check_end(self,f):
+    def check_end(self, f):
         self.result = self.is_end()
         # Printing the appropriate message if the game has ended
         if self.result != None:
@@ -301,7 +316,7 @@ class Game:
                                 self.update_depth_visits(depth)
                             self.current_state[i][j] = '.'
                             return (v, j, i)
-                        (v, _, _) = self.alphabeta(depth-1, a, b, heuristic, False)
+                        (v, _, _) = self.alphabeta(depth - 1, a, b, heuristic, False)
                         if v > value:
                             x = j
                             y = i
@@ -334,7 +349,7 @@ class Game:
                                 self.update_depth_visits(depth)
                             self.current_state[i][j] = '.'
                             return (v, j, i)
-                        (v, _, _) = self.alphabeta(depth-1, a, b, heuristic, True)
+                        (v, _, _) = self.alphabeta(depth - 1, a, b, heuristic, True)
                         if v < value:
                             x = j
                             y = i
@@ -376,7 +391,7 @@ class Game:
                                 self.update_depth_visits(depth)
                             self.current_state[i][j] = '.'
                             return (v, j, i)
-                        (v, _, _) = self.minimax(depth-1, heuristic, False)
+                        (v, _, _) = self.minimax(depth - 1, heuristic, False)
                         if v > value:
                             x = j
                             y = i
@@ -420,7 +435,7 @@ class Game:
 
     def play(self):
         with open(f"gameTrace-{self.n}{self.b}{self.s}{self.t}.txt", "w+") as f:
-            self.inital_parameters_to_file(f)
+            self.initial_parameters_to_file(f)
             while True:
                 self.draw_board()
                 if self.check_end(f):
@@ -547,7 +562,7 @@ class Game:
         f.write(
             f"6b vi) The total number of moves made by heuristic 1 is {self.total_moves_1} and the total number of moves made by heuristic 2 is {self.total_moves_2}\n")
 
-    def inital_parameters_to_file(self, f):
+    def initial_parameters_to_file(self, f):
         f.write(f"1. The size n of the board is {self.n}, the number of blocks b is {self.b}, "
                 f"the number of connected pieces s is {self.s} and the maximum time for evaluation t is {self.t} \n")
         f.write("2. The positions of the blocks are: \n")
@@ -608,8 +623,12 @@ class Game:
 
 
 def main():
-    g = Game(n=4, b=4, s=3, t=1, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], a1=True, a2=True, recommend=True)
+    # g = Game(n=4, b=4, s=3, t=1, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], a1=True, a2=True, recommend=True)
+    # g = Game(n=5, b=4, s=4, t=1, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
+    # g = Game(n=5, b=4, s=4, t=5, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
+    g = Game(n=8, b=5, s=5, t=1, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
     g.play()
+
 
 if __name__ == "__main__":
     main()
