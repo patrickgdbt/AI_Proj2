@@ -304,7 +304,7 @@ class Game:
             for i in range(self.n):
                 for j in range(self.n):
                     if self.current_state[i][j] == '.':
-                        self.current_state[i][j] = self.player_turn
+                        self.current_state[i][j] = self.X_PLAYER
                         if depth == 0 or self.is_terminal_node():
                             if heuristic == 1:
                                 v = self.e1(self.current_state)
@@ -337,7 +337,7 @@ class Game:
             for i in range(self.n):
                 for j in range(self.n):
                     if self.current_state[i][j] == '.':
-                        self.current_state[i][j] = self.player_turn
+                        self.current_state[i][j] = self.O_PLAYER
                         if depth == 0 or self.is_terminal_node():
                             if heuristic == 1:
                                 v = self.e1(self.current_state)
@@ -379,7 +379,7 @@ class Game:
             for i in range(self.n):
                 for j in range(self.n):
                     if self.current_state[i][j] == '.':
-                        self.current_state[i][j] = self.player_turn
+                        self.current_state[i][j] = self.X_PLAYER
                         if depth == 0 or self.is_terminal_node():
                             if heuristic == 1:
                                 v = self.e1(self.current_state)
@@ -405,7 +405,7 @@ class Game:
             for i in range(self.n):
                 for j in range(self.n):
                     if self.current_state[i][j] == '.':
-                        self.current_state[i][j] = self.player_turn
+                        self.current_state[i][j] = self.O_PLAYER
                         if depth == 0 or self.is_terminal_node():
                             if heuristic == 1:
                                 v = self.e1(self.current_state)
@@ -626,7 +626,8 @@ def main():
     # g = Game(n=4, b=4, s=3, t=1, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], a1=True, a2=True, recommend=True)
     # g = Game(n=5, b=4, s=4, t=1, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
     # g = Game(n=5, b=4, s=4, t=5, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
-    g = Game(n=8, b=5, s=5, t=1, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
+    # g = Game(n=8, b=5, s=5, t=1, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
+    g = Game(n=8, b=5, s=5, t=5, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
     g.play()
 
 
