@@ -295,7 +295,7 @@ class Game:
         self.time_heuristic2.append(round(end - start, 7))
         return score
 
-    def alphabeta(self, depth, a, b, heuristic, maximum=False):
+    def alphabeta(self, depth, a, b, heuristic, maximum=False, start_time=time.time()):
         escape_everything = False;
         if maximum:
             x = None
@@ -305,7 +305,9 @@ class Game:
                 for j in range(self.n):
                     if self.current_state[i][j] == '.':
                         self.current_state[i][j] = self.X_PLAYER
-                        if depth == 0 or self.is_terminal_node():
+                        time_elapsed = round(time.time() - start_time + 0.003, 7)
+                        reached_time_limit = time_elapsed > self.t
+                        if depth == 0 or self.is_terminal_node() or reached_time_limit:
                             if heuristic == 1:
                                 v = self.e1(self.current_state)
                                 self.visited += 1
@@ -316,7 +318,7 @@ class Game:
                                 self.update_depth_visits(depth)
                             self.current_state[i][j] = '.'
                             return (v, j, i)
-                        (v, _, _) = self.alphabeta(depth - 1, a, b, heuristic, False)
+                        (v, _, _) = self.alphabeta(depth - 1, a, b, heuristic, False, start_time)
                         if v > value:
                             x = j
                             y = i
@@ -338,7 +340,9 @@ class Game:
                 for j in range(self.n):
                     if self.current_state[i][j] == '.':
                         self.current_state[i][j] = self.O_PLAYER
-                        if depth == 0 or self.is_terminal_node():
+                        time_elapsed = round(time.time() - start_time + 0.003, 7)
+                        reached_time_limit = time_elapsed > self.t
+                        if depth == 0 or self.is_terminal_node() or reached_time_limit:
                             if heuristic == 1:
                                 v = self.e1(self.current_state)
                                 self.visited += 1
@@ -349,7 +353,7 @@ class Game:
                                 self.update_depth_visits(depth)
                             self.current_state[i][j] = '.'
                             return (v, j, i)
-                        (v, _, _) = self.alphabeta(depth - 1, a, b, heuristic, True)
+                        (v, _, _) = self.alphabeta(depth - 1, a, b, heuristic, True, start_time)
                         if v < value:
                             x = j
                             y = i
@@ -371,7 +375,7 @@ class Game:
         else:
             self.depthVisits[current_depth] += 1
 
-    def minimax(self, depth, heuristic, maximum=False):
+    def minimax(self, depth, heuristic, maximum=False, start_time=time.time()):
         if maximum:
             x = None
             y = None
@@ -380,7 +384,9 @@ class Game:
                 for j in range(self.n):
                     if self.current_state[i][j] == '.':
                         self.current_state[i][j] = self.X_PLAYER
-                        if depth == 0 or self.is_terminal_node():
+                        time_elapsed = round(time.time() - start_time + 0.003, 7)
+                        reached_time_limit = time_elapsed > self.t
+                        if depth == 0 or self.is_terminal_node() or reached_time_limit:
                             if heuristic == 1:
                                 v = self.e1(self.current_state)
                                 self.visited += 1
@@ -391,7 +397,7 @@ class Game:
                                 self.update_depth_visits(depth)
                             self.current_state[i][j] = '.'
                             return (v, j, i)
-                        (v, _, _) = self.minimax(depth - 1, heuristic, False)
+                        (v, _, _) = self.minimax(depth - 1, heuristic, False, start_time)
                         if v > value:
                             x = j
                             y = i
@@ -406,7 +412,9 @@ class Game:
                 for j in range(self.n):
                     if self.current_state[i][j] == '.':
                         self.current_state[i][j] = self.O_PLAYER
-                        if depth == 0 or self.is_terminal_node():
+                        time_elapsed = round(time.time() - start_time + 0.003, 7)
+                        reached_time_limit = time_elapsed > self.t
+                        if depth == 0 or self.is_terminal_node() or reached_time_limit:
                             if heuristic == 1:
                                 v = self.e1(self.current_state)
                                 self.visited += 1
@@ -417,7 +425,7 @@ class Game:
                                 self.update_depth_visits(depth)
                             self.current_state[i][j] = '.'
                             return (v, j, i)
-                        (v, _, _) = self.minimax(depth - 1, heuristic, True)
+                        (v, _, _) = self.minimax(depth - 1, heuristic, True, start_time)
                         if v < value:
                             x = j
                             y = i
@@ -444,14 +452,14 @@ class Game:
                 start = time.time()
                 if self.player_turn == self.X_PLAYER:
                     if self.algo1 == self.MINIMAX:
-                        (_, x, y) = self.minimax(self.d1, self.heuristic1, maximum=False)
+                        (_, x, y) = self.minimax(self.d1, self.heuristic1, maximum=False, start_time=start)
                     else:
-                        (m, x, y) = self.alphabeta(self.d1, -1000000, 1000000, self.heuristic1, maximum=False)
+                        (m, x, y) = self.alphabeta(self.d1, -1000000, 1000000, self.heuristic1, maximum=False, start_time=start)
                 else:
                     if self.algo2 == self.MINIMAX:
-                        (_, x, y) = self.minimax(self.d2, self.heuristic2, maximum=True)
+                        (_, x, y) = self.minimax(self.d2, self.heuristic2, maximum=True, start_time=start)
                     else:
-                        (m, x, y) = self.alphabeta(self.d2, -1000000, 1000000, self.heuristic2, maximum=True)
+                        (m, x, y) = self.alphabeta(self.d2, -1000000, 1000000, self.heuristic2, maximum=True, start_time=start)
                 end = time.time()
 
                 if (self.player_turn == self.X_PLAYER and self.p1 == self.HUMAN) or (
@@ -461,16 +469,16 @@ class Game:
                         print(F'Recommended move: x = {self.bDict[x]}, y = {y}')
                     (x, y) = self.input_move()
 
+                    self.current_state[x][y] = self.player_turn
                     self.per_turn_metrics_to_file(end, f, start, x, y)
 
-                    self.current_state[x][y] = self.player_turn
                 if (self.player_turn == self.X_PLAYER and self.p1 == self.AI) or (
                         self.player_turn == self.O_PLAYER and self.p2 == self.AI):
                     print(F'Evaluation time: {round(end - start, 7)}s')
                     print(F'Player {self.player_turn} under AI control plays: x = {self.bDict[x]}, y = {y}')
 
-                    self.per_turn_metrics_to_file(end, f, start, x, y)
                     self.current_state[y][x] = self.player_turn
+                    self.per_turn_metrics_to_file(end, f, start, x, y)
                 self.switch_player()
 
     def per_turn_metrics_to_file(self, end, f, start, x, y):
@@ -623,11 +631,14 @@ class Game:
 
 
 def main():
+    # g = Game(n=4, b=4, s=3, t=5, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], a1=False, a2=False, recommend=True)
     # g = Game(n=4, b=4, s=3, t=1, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], a1=True, a2=True, recommend=True)
     # g = Game(n=5, b=4, s=4, t=1, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
     # g = Game(n=5, b=4, s=4, t=5, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
     # g = Game(n=8, b=5, s=5, t=1, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
-    g = Game(n=8, b=5, s=5, t=5, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
+    # g = Game(n=8, b=5, s=5, t=5, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
+    # g = Game(n=8, b=6, s=5, t=1, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
+    g = Game(n=8, b=6, s=5, t=5, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
     g.play()
 
 
