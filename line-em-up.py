@@ -295,6 +295,61 @@ class Game:
         self.time_heuristic2.append(round(end - start, 7))
         return score
 
+    def alphabetatest(self, depth, a, b, heuristic, maximum=False, start_time=time.time()):
+        possible_nodes = self.get_possible_nodes(maximum)
+        if maximum:
+            x = None
+            y = None
+            value = -10000
+            for (state, row, column) in possible_nodes:
+                time_elapsed = round(time.time() - start_time + 0.003, 7)
+                reached_time_limit = time_elapsed > self.t
+                if depth == 0 or self.is_terminal_node() or reached_time_limit:
+                    if heuristic == 1:
+                        v = self.e1(self.current_state)
+                        self.visited += 1
+                        self.update_depth_visits(depth)
+                    else:
+                        v = self.e2(self.current_state)
+                        self.visited += 1
+                        self.update_depth_visits(depth)
+                    return (v, column, row)
+                (v, _, _) = self.alphabeta(depth - 1, a, b, heuristic, False, start_time)
+                if v > value:
+                    x = column
+                    y = row
+                    value = v
+                a = max(a, value)
+                if a >= b:
+                    break;
+            return (value, x, y)
+        else:
+            x = None
+            y = None
+            value = 10000
+            for (state, row, column) in possible_nodes:
+                time_elapsed = round(time.time() - start_time + 0.003, 7)
+                reached_time_limit = time_elapsed > self.t
+                if depth == 0 or self.is_terminal_node() or reached_time_limit:
+                    if heuristic == 1:
+                        v = self.e1(self.current_state)
+                        self.visited += 1
+                        self.update_depth_visits(depth)
+                    else:
+                        v = self.e2(self.current_state)
+                        self.visited += 1
+                        self.update_depth_visits(depth)
+                    return (v, column, row)
+                (v, _, _) = self.alphabeta(depth - 1, a, b, heuristic, True, start_time)
+                if v < value:
+                    x = column
+                    y = row
+                    value = v
+                b = min(a, value)
+                if b <= a:
+                    break;
+            return (value, x, y)
+
     def alphabeta(self, depth, a, b, heuristic, maximum=False, start_time=time.time()):
         escape_everything = False;
         if maximum:
@@ -374,6 +429,74 @@ class Game:
             self.depthVisits[current_depth] = 1
         else:
             self.depthVisits[current_depth] += 1
+
+    def get_possible_nodes(self, maximum=False):
+        possible_nodes = []
+        if maximum:
+            for row in range(self.n):
+                for column in range(self.n):
+                    if self.current_state[row][column] == '.':
+                        self.current_state[row][column] = self.X_PLAYER
+                        possible_nodes.append((self.current_state, row, column))
+                        self.current_state[row][column] = '.'
+        else:
+            for row in range(self.n):
+                for column in range(self.n):
+                    if self.current_state[row][column] == '.':
+                        self.current_state[row][column] = self.O_PLAYER
+                        possible_nodes.append((self.current_state, row, column))
+                        self.current_state[row][column] = '.'
+        random.shuffle(possible_nodes)
+        return possible_nodes
+
+    def minimaxtest(self, depth, heuristic, maximum=False, start_time=time.time()):
+        possible_nodes = self.get_possible_nodes(maximum)
+        if maximum:
+            x = None
+            y = None
+            value = -10000
+            for (state, row, column) in possible_nodes:
+                time_elapsed = round(time.time() - start_time + 0.003, 7)
+                reached_time_limit = time_elapsed > self.t
+                if depth == 0 or self.is_terminal_node() or reached_time_limit:
+                    if heuristic == 1:
+                        v = self.e1(self.current_state)
+                        self.visited += 1
+                        self.update_depth_visits(depth)
+                    else:
+                        v = self.e2(self.current_state)
+                        self.visited += 1
+                        self.update_depth_visits(depth)
+                    return (v, column, row)
+                (v, _, _) = self.minimax(depth - 1, heuristic, False, start_time)
+                if v > value:
+                    x = column
+                    y = row
+                    value = v
+            return (value, x, y)
+        else:
+            x = None
+            y = None
+            value = 10000
+            for (state, row, column) in possible_nodes:
+                time_elapsed = round(time.time() - start_time + 0.003, 7)
+                reached_time_limit = time_elapsed > self.t
+                if depth == 0 or self.is_terminal_node() or reached_time_limit:
+                    if heuristic == 1:
+                        v = self.e1(self.current_state)
+                        self.visited += 1
+                        self.update_depth_visits(depth)
+                    else:
+                        v = self.e2(self.current_state)
+                        self.visited += 1
+                        self.update_depth_visits(depth)
+                    return (v, column, row)
+                (v, _, _) = self.minimax(depth - 1, heuristic, False, start_time)
+                if v < value:
+                    x = column
+                    y = row
+                    value = v
+            return (value, x, y)
 
     def minimax(self, depth, heuristic, maximum=False, start_time=time.time()):
         if maximum:
