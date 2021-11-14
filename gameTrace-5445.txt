@@ -1,251 +1,264 @@
 1. The size n of the board is 5, the number of blocks b is 4, the number of connected pieces s is 4 and the maximum time for evaluation t is 5 
 2. The positions of the blocks are: 
-(x,y) = (D, 4)
-(x,y) = (E, 3)
-(x,y) = (A, 3)
+(x,y) = (B, 1)
 (x,y) = (C, 0)
+(x,y) = (A, 0)
+(x,y) = (C, 3)
 3. Player configurations:
 Player 1 is an AI. The maximum depth is 6. The algorithm is alphabeta and the heuristic used was heuristic 1
 Player 2 is an AI. The maximum depth is 6. The algorithm is alphabeta and the heuristic used was heuristic 2
 4. The initial game board:
 
+-.-..
+.-...
+.....
 ..-..
 .....
-.....
--...-
-...-.
 
-5.a) Move taken: (x,y) = (A,2)
-5.b)
-..-..
-.....
-.....
--...-
-...-.
-
-5.c i) The evaluation time was: 5.8884966s 
-5.c ii) The number of states evaluated by the heuristic function is 168174
-5 c iii) the number of nodes visited at each depth is: 
-Depth 6: 168174
-5.c iv) The average depth is 6.0 
-5.a) Move taken: (x,y) = (B,1)
-5.b)
-..-..
-.....
-X....
--...-
-...-.
-
-5.c i) The evaluation time was: 3.245502s 
-5.c ii) The number of states evaluated by the heuristic function is 54042
-5 c iii) the number of nodes visited at each depth is: 
-Depth 6: 54042
-5.c iv) The average depth is 6.0 
-5.a) Move taken: (x,y) = (A,0)
-5.b)
-..-..
-.O...
-X....
--...-
-...-.
-
-5.c i) The evaluation time was: 4.0185008s 
-5.c ii) The number of states evaluated by the heuristic function is 113130
-5 c iii) the number of nodes visited at each depth is: 
-Depth 6: 113130
-5.c iv) The average depth is 6.0 
-5.a) Move taken: (x,y) = (B,0)
-5.b)
-X.-..
-.O...
-X....
--...-
-...-.
-
-5.c i) The evaluation time was: 1.7389991s 
-5.c ii) The number of states evaluated by the heuristic function is 28902
-5 c iii) the number of nodes visited at each depth is: 
-Depth 6: 28902
-5.c iv) The average depth is 6.0 
-5.a) Move taken: (x,y) = (D,0)
-5.b)
-XO-..
-.O...
-X....
--...-
-...-.
-
-5.c i) The evaluation time was: 1.3729987s 
-5.c ii) The number of states evaluated by the heuristic function is 37894
-5 c iii) the number of nodes visited at each depth is: 
-Depth 6: 37894
-5.c iv) The average depth is 6.0 
-5.a) Move taken: (x,y) = (E,0)
-5.b)
-XO-X.
-.O...
-X....
--...-
-...-.
-
-5.c i) The evaluation time was: 0.2780023s 
-5.c ii) The number of states evaluated by the heuristic function is 4832
-5 c iii) the number of nodes visited at each depth is: 
-Depth 6: 4832
-5.c iv) The average depth is 6.0 
 5.a) Move taken: (x,y) = (D,1)
 5.b)
-XO-XO
-.O...
-X....
--...-
-...-.
+-.-..
+.-.X.
+.....
+..-..
+.....
 
-5.c i) The evaluation time was: 0.5099981s 
-5.c ii) The number of states evaluated by the heuristic function is 13468
+5.c i) The evaluation time was: 4.6994998s 
+5.c ii) The number of states evaluated by the heuristic function is 27739
 5 c iii) the number of nodes visited at each depth is: 
-Depth 6: 13468
-5.c iv) The average depth is 6.0 
-5.a) Move taken: (x,y) = (A,1)
-5.b)
-XO-XO
-.O.X.
-X....
--...-
-...-.
-
-5.c i) The evaluation time was: 0.5545022s 
-5.c ii) The number of states evaluated by the heuristic function is 9532
-5 c iii) the number of nodes visited at each depth is: 
-Depth 6: 9532
-5.c iv) The average depth is 6.0 
-5.a) Move taken: (x,y) = (C,1)
-5.b)
-XO-XO
-OO.X.
-X....
--...-
-...-.
-
-5.c i) The evaluation time was: 0.3334973s 
-5.c ii) The number of states evaluated by the heuristic function is 8526
-5 c iii) the number of nodes visited at each depth is: 
-Depth 6: 8526
+Depth 6: 27739
 5.c iv) The average depth is 6.0 
 5.a) Move taken: (x,y) = (E,1)
 5.b)
-XO-XO
-OOXX.
-X....
--...-
-...-.
+-.-..
+.-.XO
+.....
+..-..
+.....
 
-5.c i) The evaluation time was: 0.1145027s 
-5.c ii) The number of states evaluated by the heuristic function is 2082
+5.c i) The evaluation time was: 1.0325s 
+5.c ii) The number of states evaluated by the heuristic function is 46335
 5 c iii) the number of nodes visited at each depth is: 
-Depth 6: 2082
+Depth 6: 46335
 5.c iv) The average depth is 6.0 
-5.a) Move taken: (x,y) = (B,2)
+5.a) Move taken: (x,y) = (A,3)
 5.b)
-XO-XO
-OOXXO
-X....
--...-
-...-.
+-.-..
+.-.XO
+.....
+X.-..
+.....
 
-5.c i) The evaluation time was: 0.1069963s 
-5.c ii) The number of states evaluated by the heuristic function is 2710
+5.c i) The evaluation time was: 2.7064998s 
+5.c ii) The number of states evaluated by the heuristic function is 18163
 5 c iii) the number of nodes visited at each depth is: 
-Depth 6: 2710
+Depth 6: 18163
 5.c iv) The average depth is 6.0 
-5.a) Move taken: (x,y) = (C,2)
+5.a) Move taken: (x,y) = (E,0)
 5.b)
-XO-XO
-OOXXO
-XX...
--...-
-...-.
+-.-.O
+.-.XO
+.....
+X.-..
+.....
 
-5.c i) The evaluation time was: 0.1065001s 
-5.c ii) The number of states evaluated by the heuristic function is 1890
+5.c i) The evaluation time was: 0.4375019s 
+5.c ii) The number of states evaluated by the heuristic function is 28988
 5 c iii) the number of nodes visited at each depth is: 
-Depth 6: 1890
+Depth 6: 28988
 5.c iv) The average depth is 6.0 
 5.a) Move taken: (x,y) = (D,2)
 5.b)
-XO-XO
-OOXXO
-XXO..
--...-
-...-.
+-.-.O
+.-.XO
+...X.
+X.-..
+.....
 
-5.c i) The evaluation time was: 0.0309999s 
-5.c ii) The number of states evaluated by the heuristic function is 724
+5.c i) The evaluation time was: 1.664s 
+5.c ii) The number of states evaluated by the heuristic function is 10898
 5 c iii) the number of nodes visited at each depth is: 
-Depth 6: 724
+Depth 6: 10898
 5.c iv) The average depth is 6.0 
-5.a) Move taken: (x,y) = (E,2)
+5.a) Move taken: (x,y) = (C,1)
 5.b)
-XO-XO
-OOXXO
-XXOX.
--...-
-...-.
+-.-.O
+.-OXO
+...X.
+X.-..
+.....
 
-5.c i) The evaluation time was: 0.0315001s 
-5.c ii) The number of states evaluated by the heuristic function is 533
+5.c i) The evaluation time was: 0.3029981s 
+5.c ii) The number of states evaluated by the heuristic function is 13962
 5 c iii) the number of nodes visited at each depth is: 
-Depth 6: 533
+Depth 6: 13962
+5.c iv) The average depth is 6.0 
+5.a) Move taken: (x,y) = (A,1)
+5.b)
+-.-.O
+X-OXO
+...X.
+X.-..
+.....
+
+5.c i) The evaluation time was: 0.8809969s 
+5.c ii) The number of states evaluated by the heuristic function is 5256
+5 c iii) the number of nodes visited at each depth is: 
+Depth 6: 5256
+5.c iv) The average depth is 6.0 
+5.a) Move taken: (x,y) = (C,2)
+5.b)
+-.-.O
+X-OXO
+..OX.
+X.-..
+.....
+
+5.c i) The evaluation time was: 0.1859999s 
+5.c ii) The number of states evaluated by the heuristic function is 5760
+5 c iii) the number of nodes visited at each depth is: 
+Depth 6: 5760
+5.c iv) The average depth is 6.0 
+5.a) Move taken: (x,y) = (B,2)
+5.b)
+-.-.O
+X-OXO
+.XOX.
+X.-..
+.....
+
+5.c i) The evaluation time was: 0.3890011s 
+5.c ii) The number of states evaluated by the heuristic function is 2317
+5 c iii) the number of nodes visited at each depth is: 
+Depth 6: 2317
 5.c iv) The average depth is 6.0 
 5.a) Move taken: (x,y) = (B,3)
 5.b)
-XO-XO
-OOXXO
-XXOXO
--...-
-...-.
+-.-.O
+X-OXO
+.XOX.
+XO-..
+.....
 
-5.c i) The evaluation time was: 0.0069997s 
-5.c ii) The number of states evaluated by the heuristic function is 152
+5.c i) The evaluation time was: 0.1475019s 
+5.c ii) The number of states evaluated by the heuristic function is 2906
 5 c iii) the number of nodes visited at each depth is: 
-Depth 6: 152
+Depth 6: 2906
 5.c iv) The average depth is 6.0 
-5.a) Move taken: (x,y) = (C,3)
+5.a) Move taken: (x,y) = (E,4)
 5.b)
-XO-XO
-OOXXO
-XXOXO
--X..-
-...-.
+-.-.O
+X-OXO
+.XOX.
+XO-..
+....X
 
-5.c i) The evaluation time was: 0.0029995s 
-5.c ii) The number of states evaluated by the heuristic function is 62
+5.c i) The evaluation time was: 0.1720011s 
+5.c ii) The number of states evaluated by the heuristic function is 1038
 5 c iii) the number of nodes visited at each depth is: 
-Depth 5: 62
-5.c iv) The average depth is 5.0 
+Depth 6: 1038
+5.c iv) The average depth is 6.0 
+5.a) Move taken: (x,y) = (A,2)
+5.b)
+-.-.O
+X-OXO
+OXOX.
+XO-..
+....X
+
+5.c i) The evaluation time was: 0.101001s 
+5.c ii) The number of states evaluated by the heuristic function is 3119
+5 c iii) the number of nodes visited at each depth is: 
+Depth 6: 3119
+5.c iv) The average depth is 6.0 
+5.a) Move taken: (x,y) = (B,4)
+5.b)
+-.-.O
+X-OXO
+OXOX.
+XO-..
+.X..X
+
+5.c i) The evaluation time was: 0.0565021s 
+5.c ii) The number of states evaluated by the heuristic function is 402
+5 c iii) the number of nodes visited at each depth is: 
+Depth 6: 402
+5.c iv) The average depth is 6.0 
+5.a) Move taken: (x,y) = (E,3)
+5.b)
+-.-.O
+X-OXO
+OXOX.
+XO-.O
+.X..X
+
+5.c i) The evaluation time was: 0.0914969s 
+5.c ii) The number of states evaluated by the heuristic function is 870
+5 c iii) the number of nodes visited at each depth is: 
+Depth 6: 870
+5.c iv) The average depth is 6.0 
+5.a) Move taken: (x,y) = (A,4)
+5.b)
+-.-.O
+X-OXO
+OXOX.
+XO-.O
+XX..X
+
+5.c i) The evaluation time was: 0.0235021s 
+5.c ii) The number of states evaluated by the heuristic function is 166
+5 c iii) the number of nodes visited at each depth is: 
+Depth 6: 166
+5.c iv) The average depth is 6.0 
+5.a) Move taken: (x,y) = (D,0)
+5.b)
+-.-OO
+X-OXO
+OXOX.
+XO-.O
+XX..X
+
+5.c i) The evaluation time was: 0.0045009s 
+5.c ii) The number of states evaluated by the heuristic function is 149
+5 c iii) the number of nodes visited at each depth is: 
+Depth 6: 149
+5.c iv) The average depth is 6.0 
 5.a) Move taken: (x,y) = (D,3)
 5.b)
+-.-OO
+X-OXO
+OXOX.
 XO-XO
-OOXXO
-XXOXO
--XO.-
-...-.
+XX..X
 
-5.c i) The evaluation time was: 0.0009997s 
-5.c ii) The number of states evaluated by the heuristic function is 22
+5.c i) The evaluation time was: 0.0050011s 
+5.c ii) The number of states evaluated by the heuristic function is 28
 5 c iii) the number of nodes visited at each depth is: 
-Depth 4: 22
+Depth 5: 28
+5.c iv) The average depth is 5.0 
+5.a) Move taken: (x,y) = (E,2)
+5.b)
+-.-OO
+X-OXO
+OXOXO
+XO-XO
+XX..X
+
+5.c i) The evaluation time was: 0.000998s 
+5.c ii) The number of states evaluated by the heuristic function is 19
+5 c iii) the number of nodes visited at each depth is: 
+Depth 4: 19
 5.c iv) The average depth is 4.0 
-6a) The winner is X!
-6b i) The average time for heuristic 1 was: 3.056850667053536e-05 
- The average time for heuristic 2 was: 5.3133721717791366e-05 
-6b ii) Heuristic 1 evaluated 344800 nodes and heuristic 2 evaluated 73116 nodes
-6b iii) The average of the per-move average depth of the heuristic evaluation for heuristic 1 is 5.777777777777778 
-The average of the per-move average depth of the heuristic evaluation for heuristic 2 is 5.875 
+6a) The winner is O!
+6b i) The average time for heuristic 1 was: 0.00014135341554682434 
+ The average time for heuristic 2 was: 1.3941491362086972e-05 
+6b ii) Heuristic 1 evaluated 66007 nodes and heuristic 2 evaluated 99743 nodes
+6b iii) The average of the per-move average depth of the heuristic evaluation for heuristic 1 is 5.888888888888889 
+The average of the per-move average depth of the heuristic evaluation for heuristic 2 is 5.777777777777778 
 6b iv) The total number of states evaluated at each depth for heuristic 1: 
-Depth 6 : 344778
-Depth 4 : 22
+Depth 6 : 65979
+Depth 5 : 28
 The total number of states evaluated at each depth for heuristic 2: 
-Depth 6 : 101813
-Depth 5 : 62
-6b vi) The total number of moves made by heuristic 1 is 9 and the total number of moves made by heuristic 2 is 8
+Depth 6 : 102089
+Depth 4 : 19
+6b vi) The total number of moves made by heuristic 1 is 9 and the total number of moves made by heuristic 2 is 9

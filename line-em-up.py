@@ -295,6 +295,89 @@ class Game:
         self.time_heuristic2.append(round(end - start, 7))
         return score
 
+    def e3(self, state):
+        start = time.time()
+        score = 0
+
+        # row
+        for row in state:
+            row_score = 0
+            current_element = '.'
+            repeat_occurence = 0
+            for element in row:
+                if element == self.X_PLAYER:
+                    if current_element == self.X_PLAYER:
+                        repeat_occurence += 1
+                        row_score += repeat_occurence
+                    else:
+                        current_element = self.X_PLAYER
+                        repeat_occurence = 0
+                        row_score += 1
+                if element == self.O_PLAYER:
+                    if current_element == self.O_PLAYER:
+                        repeat_occurence += 1
+                        row_score -= repeat_occurence
+                    else:
+                        current_element = self.O_PLAYER
+                        repeat_occurence = 0
+                        row_score -= 1
+            score += row_score
+
+        # column
+        for i in range(self.n):
+            col = [row[i] for row in state]
+            column_score = 0
+            current_element = '.'
+            repeat_occurence = 0
+            for element in col:
+                if element == self.X_PLAYER:
+                    if current_element == self.X_PLAYER:
+                        repeat_occurence += 1
+                        column_score += repeat_occurence
+                    else:
+                        current_element = self.X_PLAYER
+                        repeat_occurence = 0
+                        column_score += 1
+                if element == self.O_PLAYER:
+                    if current_element == self.O_PLAYER:
+                        repeat_occurence += 1
+                        column_score -= repeat_occurence
+                    else:
+                        current_element = self.O_PLAYER
+                        repeat_occurence = 0
+                        column_score -= 1
+            score += column_score
+
+        # diagonal
+        valid_diagonals = self.get_valid_diags(state, self.s)
+        for diagonal in valid_diagonals:
+            diag_score = 0
+            current_element = '.'
+            repeat_occurence = 0
+            for element in diagonal:
+                if element == self.X_PLAYER:
+                    if current_element == self.X_PLAYER:
+                        repeat_occurence += 1
+                        diag_score += repeat_occurence
+                    else:
+                        current_element = self.X_PLAYER
+                        repeat_occurence = 0
+                        diag_score += 1
+                if element == self.O_PLAYER:
+                    if current_element == self.O_PLAYER:
+                        repeat_occurence += 1
+                        diag_score -= repeat_occurence
+                    else:
+                        current_element = self.O_PLAYER
+                        repeat_occurence = 0
+                        diag_score -= 1
+            score += diag_score
+
+        self.count_heuristic2 += 1
+        end = time.time()
+        self.time_heuristic2.append(round(end - start, 7))
+        return score
+
     def alphabetatest(self, depth, a, b, heuristic, maximum=False, start_time=time.time()):
         possible_nodes = self.get_possible_nodes(maximum)
         if maximum:
@@ -306,11 +389,11 @@ class Game:
                 reached_time_limit = time_elapsed > self.t
                 if depth == 0 or self.is_terminal_node() or reached_time_limit:
                     if heuristic == 1:
-                        v = self.e1(self.current_state)
+                        v = self.e3(self.current_state)
                         self.visited += 1
                         self.update_depth_visits(depth)
                     else:
-                        v = self.e2(self.current_state)
+                        v = self.e3(self.current_state)
                         self.visited += 1
                         self.update_depth_visits(depth)
                     return (v, column, row)
@@ -332,11 +415,11 @@ class Game:
                 reached_time_limit = time_elapsed > self.t
                 if depth == 0 or self.is_terminal_node() or reached_time_limit:
                     if heuristic == 1:
-                        v = self.e1(self.current_state)
+                        v = self.e3(self.current_state)
                         self.visited += 1
                         self.update_depth_visits(depth)
                     else:
-                        v = self.e2(self.current_state)
+                        v = self.e3(self.current_state)
                         self.visited += 1
                         self.update_depth_visits(depth)
                     return (v, column, row)
@@ -407,7 +490,7 @@ class Game:
                                 self.visited += 1
                                 self.update_depth_visits(depth)
                             self.current_state[i][j] = '.'
-                            return (v, j, i)
+                            return v, j, i
                         (v, _, _) = self.alphabeta(depth - 1, a, b, heuristic, True, start_time)
                         if v < value:
                             x = j
@@ -421,7 +504,7 @@ class Game:
                         self.current_state[i][j] = '.'
                 if escape_everything:
                     break
-            return (value, x, y)
+            return value, x, y
 
     def update_depth_visits(self, depth):
         current_depth = self.d1 - depth
@@ -460,11 +543,11 @@ class Game:
                 reached_time_limit = time_elapsed > self.t
                 if depth == 0 or self.is_terminal_node() or reached_time_limit:
                     if heuristic == 1:
-                        v = self.e1(self.current_state)
+                        v = self.e3(self.current_state)
                         self.visited += 1
                         self.update_depth_visits(depth)
                     else:
-                        v = self.e2(self.current_state)
+                        v = self.e3(self.current_state)
                         self.visited += 1
                         self.update_depth_visits(depth)
                     return (v, column, row)
@@ -483,11 +566,11 @@ class Game:
                 reached_time_limit = time_elapsed > self.t
                 if depth == 0 or self.is_terminal_node() or reached_time_limit:
                     if heuristic == 1:
-                        v = self.e1(self.current_state)
+                        v = self.e3(self.current_state)
                         self.visited += 1
                         self.update_depth_visits(depth)
                     else:
-                        v = self.e2(self.current_state)
+                        v = self.e3(self.current_state)
                         self.visited += 1
                         self.update_depth_visits(depth)
                     return (v, column, row)
@@ -575,14 +658,14 @@ class Game:
                 start = time.time()
                 if self.player_turn == self.X_PLAYER:
                     if self.algo1 == self.MINIMAX:
-                        (_, x, y) = self.minimax(self.d1, self.heuristic1, maximum=False, start_time=start)
+                        (_, x, y) = self.minimaxtest(self.d1, self.heuristic1, maximum=False, start_time=start)
                     else:
-                        (m, x, y) = self.alphabeta(self.d1, -1000000, 1000000, self.heuristic1, maximum=False, start_time=start)
+                        (m, x, y) = self.alphabetatest(self.d1, -1000000, 1000000, self.heuristic1, maximum=False, start_time=start)
                 else:
                     if self.algo2 == self.MINIMAX:
-                        (_, x, y) = self.minimax(self.d2, self.heuristic2, maximum=True, start_time=start)
+                        (_, x, y) = self.minimaxtest(self.d2, self.heuristic2, maximum=True, start_time=start)
                     else:
-                        (m, x, y) = self.alphabeta(self.d2, -1000000, 1000000, self.heuristic2, maximum=True, start_time=start)
+                        (m, x, y) = self.alphabetatest(self.d2, -1000000, 1000000, self.heuristic2, maximum=True, start_time=start)
                 end = time.time()
 
                 if (self.player_turn == self.X_PLAYER and self.p1 == self.HUMAN) or (
@@ -759,9 +842,9 @@ def main():
     # g = Game(n=5, b=4, s=4, t=1, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
     # g = Game(n=5, b=4, s=4, t=5, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
     # g = Game(n=8, b=5, s=5, t=1, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
-    # g = Game(n=8, b=5, s=5, t=5, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
+    g = Game(n=8, b=5, s=5, t=5, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
     # g = Game(n=8, b=6, s=5, t=1, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
-    g = Game(n=8, b=6, s=5, t=5, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
+    # g = Game(n=8, b=6, s=5, t=5, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
     g.play()
 
 
