@@ -56,6 +56,7 @@ class Game:
         self.depthVisits = {}
         self.aDict = dict(zip(string.ascii_uppercase, range(0, 10)))
         self.bDict = dict(zip(range(0, 10), string.ascii_uppercase))
+        self.average_recursive_depth = 0
         self.initialize_game()
 
     def initialize_game(self):
@@ -354,133 +355,56 @@ class Game:
         self.time_heuristic2.append(round(end - start, 7))
         return score
 
-    def alphabetatest(self, depth, a, b, heuristic, maximum=False, start_time=time.time()):
+    def alpha_beta(self, state, depth, a, b, heuristic, maximum=False, start_time=time.time()):
+        time_elapsed = round(time.time() - start_time + 0.003, 7)
+        reached_time_limit = time_elapsed > self.t
+        if depth <= 0 or self.is_terminal_node(state) or reached_time_limit:
+            if heuristic == 1:
+                v = self.e1(state)
+                self.visited += 1
+                self.update_depth_visits(depth)
+            else:
+                v = self.e2(state)
+                self.visited += 1
+                self.update_depth_visits(depth)
+            if self.player_turn == self.X_PLAYER:
+                return v, None, None, self.d1 - depth
+            else:
+                return v, None, None, self.d2 - depth
+
         possible_nodes = self.get_possible_nodes(maximum)
+        depth_list = []
+
         if maximum:
             x = None
             y = None
             value = -10000
             for (state, row, column) in possible_nodes:
-                time_elapsed = round(time.time() - start_time + 0.003, 7)
-                reached_time_limit = time_elapsed > self.t
-                if depth <= 0 or self.is_terminal_node() or reached_time_limit:
-                    if heuristic == 1:
-                        v = self.e1(self.current_state)
-                        self.visited += 1
-                        self.update_depth_visits(depth)
-                    else:
-                        v = self.e2(self.current_state)
-                        self.visited += 1
-                        self.update_depth_visits(depth)
-                    return (v, column, row)
-                (v, _, _) = self.alphabetatest(depth - 1, a, b, heuristic, False, start_time)
+                (v, _, _, d) = self.alpha_beta(state, depth - 1, a, b, heuristic, maximum=False, start_time=start_time)
+                depth_list.append(d)
                 if v > value:
                     x = column
                     y = row
                     value = v
                 a = max(a, value)
                 if a >= b:
-                    break;
-            return (value, x, y)
+                    break
+            return value, x, y, sum(depth_list)/len(depth_list)
         else:
             x = None
             y = None
             value = 10000
             for (state, row, column) in possible_nodes:
-                time_elapsed = round(time.time() - start_time + 0.003, 7)
-                reached_time_limit = time_elapsed > self.t
-                if depth <= 0 or self.is_terminal_node() or reached_time_limit:
-                    if heuristic == 1:
-                        v = self.e1(self.current_state)
-                        self.visited += 1
-                        self.update_depth_visits(depth)
-                    else:
-                        v = self.e2(self.current_state)
-                        self.visited += 1
-                        self.update_depth_visits(depth)
-                    return (v, column, row)
-                (v, _, _) = self.alphabetatest(depth - 1, a, b, heuristic, True, start_time)
+                (v, _, _, d) = self.alpha_beta(state, depth - 1, a, b, heuristic, maximum=True, start_time=start_time)
+                depth_list.append(d)
                 if v < value:
                     x = column
                     y = row
                     value = v
                 b = min(a, value)
                 if b <= a:
-                    break;
-            return (value, x, y)
-
-    def alphabeta(self, depth, a, b, heuristic, maximum=False, start_time=time.time()):
-        escape_everything = False;
-        if maximum:
-            x = None
-            y = None
-            value = -10000
-            for i in range(self.n):
-                for j in range(self.n):
-                    if self.current_state[i][j] == '.':
-                        self.current_state[i][j] = self.X_PLAYER
-                        time_elapsed = round(time.time() - start_time + 0.003, 7)
-                        reached_time_limit = time_elapsed > self.t
-                        if depth <= 0 or self.is_terminal_node() or reached_time_limit:
-                            if heuristic == 1:
-                                v = self.e1(self.current_state)
-                                self.visited += 1
-                                self.update_depth_visits(depth)
-                            else:
-                                v = self.e2(self.current_state)
-                                self.visited += 1
-                                self.update_depth_visits(depth)
-                            self.current_state[i][j] = '.'
-                            return (v, j, i)
-                        (v, _, _) = self.alphabeta(depth - 1, a, b, heuristic, False, start_time)
-                        if v > value:
-                            x = j
-                            y = i
-                            value = v
-                        a = max(a, value)
-                        if a >= b:
-                            self.current_state[i][j] = '.'
-                            escape_everything = True
-                            break
-                        self.current_state[i][j] = '.'
-                if escape_everything:
                     break
-            return (value, x, y)
-        else:
-            x = None
-            y = None
-            value = 10000
-            for i in range(self.n):
-                for j in range(self.n):
-                    if self.current_state[i][j] == '.':
-                        self.current_state[i][j] = self.O_PLAYER
-                        time_elapsed = round(time.time() - start_time + 0.003, 7)
-                        reached_time_limit = time_elapsed > self.t
-                        if depth <= 0 or self.is_terminal_node() or reached_time_limit:
-                            if heuristic == 1:
-                                v = self.e1(self.current_state)
-                                self.visited += 1
-                                self.update_depth_visits(depth)
-                            else:
-                                v = self.e2(self.current_state)
-                                self.visited += 1
-                                self.update_depth_visits(depth)
-                            self.current_state[i][j] = '.'
-                            return v, j, i
-                        (v, _, _) = self.alphabeta(depth - 1, a, b, heuristic, True, start_time)
-                        if v < value:
-                            x = j
-                            y = i
-                            value = v
-                        b = min(b, value)
-                        if b <= a:
-                            self.current_state[i][j] = '.'
-                            escape_everything = True
-                            break
-                        self.current_state[i][j] = '.'
-                if escape_everything:
-                    break
-            return value, x, y
+            return value, x, y, sum(depth_list)/len(depth_list)
 
     def update_depth_visits(self, depth):
         if self.player_turn == self.X_PLAYER:
@@ -512,116 +436,53 @@ class Game:
         random.shuffle(possible_nodes)
         return possible_nodes
 
-    def minimaxtest(self, depth, heuristic, maximum=False, start_time=time.time()):
+    def mini_max(self, state, depth, heuristic, maximum=False, start_time=time.time()):
+        time_elapsed = round(time.time() - start_time + 0.003, 7)
+        reached_time_limit = time_elapsed > self.t
+        if depth <= 0 or self.is_terminal_node(state) or reached_time_limit:
+            if heuristic == 1:
+                v = self.e1(state)
+                self.visited += 1
+                self.update_depth_visits(depth)
+            else:
+                v = self.e2(state)
+                self.visited += 1
+                self.update_depth_visits(depth)
+            if self.player_turn == self.X_PLAYER:
+                return v, None, None, self.d1 - depth
+            else:
+                return v, None, None, self.d2 - depth
+
         possible_nodes = self.get_possible_nodes(maximum)
+        depth_list = []
         if maximum:
             x = None
             y = None
             value = -10000
             for (state, row, column) in possible_nodes:
-                time_elapsed = round(time.time() - start_time + 0.003, 7)
-                reached_time_limit = time_elapsed > self.t
-                if depth <= 0 or self.is_terminal_node() or reached_time_limit:
-                    if heuristic == 1:
-                        v = self.e1(self.current_state)
-                        self.visited += 1
-                        self.update_depth_visits(depth)
-                    else:
-                        v = self.e2(self.current_state)
-                        self.visited += 1
-                        self.update_depth_visits(depth)
-                    return (v, column, row)
-                (v, _, _) = self.minimaxtest(depth - 1, heuristic, False, start_time)
+                (v, _, _, d) = self.mini_max(state, depth - 1, heuristic, maximum=False, start_time=start_time)
+                depth_list.append(d)
                 if v > value:
                     x = column
                     y = row
                     value = v
-            return (value, x, y)
+            return value, x, y, sum(depth_list)/len(depth_list)
         else:
             x = None
             y = None
             value = 10000
             for (state, row, column) in possible_nodes:
-                time_elapsed = round(time.time() - start_time + 0.003, 7)
-                reached_time_limit = time_elapsed > self.t
-                if depth <= 0 or self.is_terminal_node() or reached_time_limit:
-                    if heuristic == 1:
-                        v = self.e1(self.current_state)
-                        self.visited += 1
-                        self.update_depth_visits(depth)
-                    else:
-                        v = self.e2(self.current_state)
-                        self.visited += 1
-                        self.update_depth_visits(depth)
-                    return (v, column, row)
-                (v, _, _) = self.minimaxtest(depth - 1, heuristic, False, start_time)
+                (v, _, _, d) = self.mini_max(state, depth - 1, heuristic, maximum=True, start_time=start_time)
+                depth_list.append(d)
                 if v < value:
                     x = column
                     y = row
                     value = v
-            return (value, x, y)
+            return value, x, y, sum(depth_list)/len(depth_list)
 
-    def minimax(self, depth, heuristic, maximum=False, start_time=time.time()):
-        if maximum:
-            x = None
-            y = None
-            value = -10000
-            for i in range(self.n):
-                for j in range(self.n):
-                    if self.current_state[i][j] == '.':
-                        self.current_state[i][j] = self.X_PLAYER
-                        time_elapsed = round(time.time() - start_time + 0.003, 7)
-                        reached_time_limit = time_elapsed > self.t
-                        if depth <= 0 or self.is_terminal_node() or reached_time_limit:
-                            if heuristic == 1:
-                                v = self.e1(self.current_state)
-                                self.visited += 1
-                                self.update_depth_visits(depth)
-                            else:
-                                v = self.e2(self.current_state)
-                                self.visited += 1
-                                self.update_depth_visits(depth)
-                            self.current_state[i][j] = '.'
-                            return (v, j, i)
-                        (v, _, _) = self.minimax(depth - 1, heuristic, False, start_time)
-                        if v > value:
-                            x = j
-                            y = i
-                            value = v
-                        self.current_state[i][j] = '.'
-            return (value, x, y)
-        else:
-            x = None
-            y = None
-            value = 10000
-            for i in range(self.n):
-                for j in range(self.n):
-                    if self.current_state[i][j] == '.':
-                        self.current_state[i][j] = self.O_PLAYER
-                        time_elapsed = round(time.time() - start_time + 0.003, 7)
-                        reached_time_limit = time_elapsed > self.t
-                        if depth <= 0 or self.is_terminal_node() or reached_time_limit:
-                            if heuristic == 1:
-                                v = self.e1(self.current_state)
-                                self.visited += 1
-                                self.update_depth_visits(depth)
-                            else:
-                                v = self.e2(self.current_state)
-                                self.visited += 1
-                                self.update_depth_visits(depth)
-                            self.current_state[i][j] = '.'
-                            return (v, j, i)
-                        (v, _, _) = self.minimax(depth - 1, heuristic, True, start_time)
-                        if v < value:
-                            x = j
-                            y = i
-                            value = v
-                        self.current_state[i][j] = '.'
-            return (value, x, y)
-
-    def is_terminal_node(self):
+    def is_terminal_node(self, state):
         full = True
-        for row in self.current_state:
+        for row in state:
             if '.' in row:
                 full = False
 
@@ -638,15 +499,16 @@ class Game:
                 start = time.time()
                 if self.player_turn == self.X_PLAYER:
                     if self.algo1 == self.MINIMAX:
-                        (_, x, y) = self.minimaxtest(self.d1, self.heuristic1, maximum=False, start_time=start)
+                        (_, x, y, average_recursive_depth) = self.mini_max(self.current_state, self.d1, self.heuristic1, maximum=False, start_time=start)
                     else:
-                        (m, x, y) = self.alphabetatest(self.d1, -1000000, 1000000, self.heuristic1, maximum=False, start_time=start)
+                        (m, x, y, average_recursive_depth) = self.alpha_beta(self.current_state, self.d1, -1000000, 1000000, self.heuristic1, maximum=False, start_time=start)
                 else:
                     if self.algo2 == self.MINIMAX:
-                        (_, x, y) = self.minimaxtest(self.d2, self.heuristic2, maximum=True, start_time=start)
+                        (_, x, y, average_recursive_depth) = self.mini_max(self.current_state, self.d2, self.heuristic2, maximum=True, start_time=start)
                     else:
-                        (m, x, y) = self.alphabetatest(self.d2, -1000000, 1000000, self.heuristic2, maximum=True, start_time=start)
+                        (m, x, y, average_recursive_depth) = self.alpha_beta(self.current_state, self.d2, -1000000, 1000000, self.heuristic2, maximum=True, start_time=start)
                 end = time.time()
+                self.average_recursive_depth = average_recursive_depth
 
                 if (self.player_turn == self.X_PLAYER and self.p1 == self.HUMAN) or (
                         self.player_turn == self.O_PLAYER and self.p2 == self.HUMAN):
@@ -721,6 +583,9 @@ class Game:
         elif self.player_turn == self.O_PLAYER and self.heuristic2 == 2:
             self.per_move_average_2.append(numerator / denominator)
         self.depthVisits = {}
+
+        f.write(f"5.c v) The average recursive depth is {self.average_recursive_depth}\n")
+        self.average_recursive_depth = 0
 
     def end_of_game_metrics_to_file(self, f):
         if len(self.time_heuristic1) != 0:
@@ -820,11 +685,11 @@ def main():
     # g = Game(n=4, b=4, s=3, t=5, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], a1=False, a2=False, recommend=True)
     # g = Game(n=4, b=4, s=3, t=1, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], a1=True, a2=True, recommend=True)
     # g = Game(n=5, b=4, s=4, t=1, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
-    g = Game(n=5, b=4, s=4, t=5, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
+    # g = Game(n=5, b=4, s=4, t=5, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
     # g = Game(n=8, b=5, s=5, t=1, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
     # g = Game(n=8, b=5, s=5, t=5, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
     # g = Game(n=8, b=6, s=5, t=1, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
-    # g = Game(n=8, b=6, s=5, t=5, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
+    g = Game(n=8, b=6, s=5, t=5, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
     g.play()
 
 
