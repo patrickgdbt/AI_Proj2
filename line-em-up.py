@@ -18,7 +18,7 @@ class Game:
     BLOCK = "-"
 
     def __init__(self, recommend=True, n=3, b=0, s=3, d1=5, d2=5, t=5, blocks=[], a1=True, a2=True,
-                 random_blocks=False):
+                 random_blocks=False, h1=1, h2=2):
         self.current_state = []
         self.random_blocks = random_blocks
         self.recommend = recommend
@@ -40,8 +40,8 @@ class Game:
         else:
             self.algo2 = self.MINIMAX
         self.recommend = True
-        self.heuristic1 = 1
-        self.heuristic2 = 2
+        self.heuristic1 = h1
+        self.heuristic2 = h2
         self.time_heuristic1 = []
         self.time_heuristic2 = []
         self.count_heuristic1 = 0
@@ -820,10 +820,10 @@ def main():
     # g = Game(n=4, b=4, s=3, t=5, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], a1=False, a2=False, recommend=True)
     # g = Game(n=4, b=4, s=3, t=1, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], a1=True, a2=True, recommend=True)
     # g = Game(n=5, b=4, s=4, t=1, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
-    # g = Game(n=5, b=4, s=4, t=5, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
+    g = Game(n=5, b=4, s=4, t=5, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
     # g = Game(n=8, b=5, s=5, t=1, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
     # g = Game(n=8, b=5, s=5, t=5, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
-    g = Game(n=8, b=6, s=5, t=1, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
+    # g = Game(n=8, b=6, s=5, t=1, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
     # g = Game(n=8, b=6, s=5, t=5, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
     g.play()
 
