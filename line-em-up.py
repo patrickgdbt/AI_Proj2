@@ -16,6 +16,14 @@ class Game:
     X_PLAYER = 'X'
     O_PLAYER = 'O'
     BLOCK = "-"
+    heuristic1_wins = 0
+    heuristic2_wins = 0
+    scoreboard_evaluation_times = []
+    scoreboard_total_evaluations = []
+    scoreboard_evaluations_by_depth = {}
+    scoreboard_depths = []
+    scoreboard_recursion_depth = []
+    scoreboard_moves_per_game = []
 
     def __init__(self, recommend=True, n=3, b=0, s=3, d1=5, d2=5, t=5, blocks=[], a1=True, a2=True,
                  random_blocks=False, h1=1, h2=2):
@@ -57,6 +65,8 @@ class Game:
         self.aDict = dict(zip(string.ascii_uppercase, range(0, 10)))
         self.bDict = dict(zip(range(0, 10), string.ascii_uppercase))
         self.average_recursive_depth = 0
+        self.average_recursive_depths1 = []
+        self.average_recursive_depths2 = []
         self.initialize_game()
 
     def initialize_game(self):
@@ -121,7 +131,17 @@ class Game:
 
     def draw_board(self):
         print()
+        print("  ", end="")
+        for i in range(self.n):
+            print(self.bDict[i], end="")
+        print()
+        print(" ", end="")
+        print("+", end="")
+        for i in range(self.n):
+            print("-", end="")
+        print()
         for y in range(0, self.n):
+            print(f"{y}|", end="")
             for x in range(0, self.n):
                 print(F'{self.current_state[y][x]}', end="")
             print()
@@ -129,7 +149,17 @@ class Game:
 
     def draw_board_to_file(self, f):
         f.write("\n")
+        f.write("  ")
+        for i in range(self.n):
+            f.write(self.bDict[i])
+        f.write("\n")
+        f.write(" ")
+        f.write("+")
+        for i in range(self.n):
+            f.write("-")
+        f.write("\n")
         for y in range(0, self.n):
+            f.write(f"{y}|")
             for x in range(0, self.n):
                 f.write(F'{self.current_state[y][x]}')
             f.write("\n")
@@ -199,9 +229,17 @@ class Game:
             if self.result == self.X_PLAYER:
                 print(f'The winner is {self.X_PLAYER}!')
                 f.write(f'6a) The winner is {self.X_PLAYER}!\n')
+                if self.heuristic1 == 1:
+                    Game.heuristic1_wins += 1
+                else:
+                    Game.heuristic2_wins += 1
             elif self.result == self.O_PLAYER:
                 print(f'The winner is {self.O_PLAYER}!')
                 f.write(f'6a) The winner is {self.O_PLAYER}!\n')
+                if self.heuristic2 == 1:
+                    Game.heuristic1_wins += 1
+                else:
+                    Game.heuristic2_wins += 1
             elif self.result == '.':
                 print("It's a tie!")
                 f.write("6a) It's a tie!")
@@ -247,16 +285,6 @@ class Game:
                 possible_wins.append(baby_row)
 
         for lst in possible_wins:
-            # if self.O_PLAYER in lst and self.X_PLAYER not in lst and self.BLOCK not in lst and lst.count(
-            #         self.O_PLAYER) == self.s:
-            #     end = time.time()
-            #     self.time_heuristic2.append(round(end - start, 7))
-            #     return -1000
-            # if self.X_PLAYER in lst and self.O_PLAYER not in lst and self.BLOCK not in lst and lst.count(
-            #         self.X_PLAYER) == self.s:
-            #     end = time.time()
-            #     self.time_heuristic2.append(round(end - start, 7))
-            #     return +1000
             if self.O_PLAYER in lst and self.X_PLAYER not in lst and self.BLOCK not in lst:
                 score -= lst.count(self.O_PLAYER)
             elif self.X_PLAYER in lst and self.O_PLAYER not in lst and self.BLOCK not in lst:
@@ -350,9 +378,9 @@ class Game:
                         diag_score -= 1
             score += diag_score
 
-        self.count_heuristic2 += 1
+        self.count_heuristic1 += 1
         end = time.time()
-        self.time_heuristic2.append(round(end - start, 7))
+        self.time_heuristic1.append(round(end - start, 7))
         return score
 
     def alpha_beta(self, state, depth, a, b, heuristic, maximum=False, start_time=time.time()):
@@ -585,43 +613,76 @@ class Game:
         self.depthVisits = {}
 
         f.write(f"5.c v) The average recursive depth is {self.average_recursive_depth}\n")
+        if self.player_turn == self.X_PLAYER and self.heuristic1 == 1:
+            self.average_recursive_depths1.append(self.average_recursive_depth)
+        elif self.player_turn == self.X_PLAYER and self.heuristic1 == 2:
+            self.average_recursive_depths2.append(self.average_recursive_depth)
+        elif self.player_turn == self.O_PLAYER and self.heuristic2 == 1:
+            self.average_recursive_depths1.append(self.average_recursive_depth)
+        elif self.player_turn == self.O_PLAYER and self.heuristic2 == 2:
+            self.average_recursive_depths2.append(self.average_recursive_depth)
+
+        f.write("\n")
         self.average_recursive_depth = 0
 
     def end_of_game_metrics_to_file(self, f):
         if len(self.time_heuristic1) != 0:
             f.write(
                 f"6b i) The average time for heuristic 1 was: {sum(self.time_heuristic1) / len(self.time_heuristic1)} \n")
+            Game.scoreboard_evaluation_times.append(sum(self.time_heuristic1) / len(self.time_heuristic1))
         else:
             f.write(f"6b i) The average time for heuristic 1 was: 0 as it was not used \n")
         if len(self.time_heuristic2) != 0:
             f.write(
                 f" The average time for heuristic 2 was: {sum(self.time_heuristic2) / len(self.time_heuristic2)} \n")
+            Game.scoreboard_evaluation_times.append(sum(self.time_heuristic2) / len(self.time_heuristic2))
         else:
             f.write(f"The average time for heuristic 2 was: 0 as it was not used \n")
+
         f.write(
             f"6b ii) Heuristic 1 evaluated {self.count_heuristic1} nodes and heuristic 2 evaluated {self.count_heuristic2} nodes\n")
+        Game.scoreboard_total_evaluations.append(self.count_heuristic1 + self.count_heuristic2)
+
         if len(self.per_move_average_1) != 0:
             f.write(
                 f"6b iii) The average of the per-move average depth of the heuristic evaluation for heuristic 1 is {sum(self.per_move_average_1) / len(self.per_move_average_1)} \n")
+            Game.scoreboard_depths.append(sum(self.per_move_average_1) / len(self.per_move_average_1))
         else:
             f.write(
                 f"6b iii) The average of the per-move average depth of the heuristic evaluation for heuristic 1 is 0 as it was not used \n")
         if len(self.per_move_average_2) != 0:
             f.write(
                 f"The average of the per-move average depth of the heuristic evaluation for heuristic 2 is {sum(self.per_move_average_2) / len(self.per_move_average_2)} \n")
+            Game.scoreboard_depths.append(sum(self.per_move_average_2) / len(self.per_move_average_2))
         else:
             f.write(
                 f"The average of the per-move average depth of the heuristic evaluation for heuristic 2 is 0 as it was not used \n")
+
         f.write("6b iv) The total number of states evaluated at each depth for heuristic 1: \n")
         for depth in self.total_depth_1:
             f.write(f"Depth {depth} : {self.total_depth_1[depth]}\n")
+            if depth not in Game.scoreboard_evaluations_by_depth:
+                Game.scoreboard_evaluations_by_depth[depth] = [self.total_depth_1[depth]]
+            else:
+                Game.scoreboard_evaluations_by_depth[depth].append(self.total_depth_1[depth])
         f.write("The total number of states evaluated at each depth for heuristic 2: \n")
         for depth in self.total_depth_2:
             f.write(f"Depth {depth} : {self.total_depth_2[depth]}\n")
+            if depth not in Game.scoreboard_evaluations_by_depth:
+                Game.scoreboard_evaluations_by_depth[depth] = [self.total_depth_2[depth]]
+            else:
+                Game.scoreboard_evaluations_by_depth[depth].append(self.total_depth_2[depth])
+
+        f.write(f"6b v) The average of the per move ARD for heuristic 1 is {sum(self.average_recursive_depths1)/len(self.average_recursive_depths1)}\n")
+        Game.scoreboard_recursion_depth.append(sum(self.average_recursive_depths1)/len(self.average_recursive_depths1))
+        f.write(f" The average of the per move ARD for heuristic 2 is {sum(self.average_recursive_depths2) / len(self.average_recursive_depths2)}\n")
+        Game.scoreboard_recursion_depth.append(sum(self.average_recursive_depths2) / len(self.average_recursive_depths2))
+
         f.write(
             f"6b vi) The total number of moves made by heuristic 1 is {self.total_moves_1} and the total number of moves made by heuristic 2 is {self.total_moves_2}\n")
+        Game.scoreboard_moves_per_game.append(self.total_moves_1+self.total_moves_2)
 
-    def initial_parameters_to_file(self, f):
+    def initial_parameters_to_file(self, f, board=True):
         f.write(f"1. The size n of the board is {self.n}, the number of blocks b is {self.b}, "
                 f"the number of connected pieces s is {self.s} and the maximum time for evaluation t is {self.t} \n")
         f.write("2. The positions of the blocks are: \n")
@@ -646,8 +707,10 @@ class Game:
             else:
                 f.write(
                     f"Player 2 is an AI. The maximum depth is {self.d2}. The algorithm is alphabeta and the heuristic used was heuristic {self.heuristic2}\n")
-        f.write("4. The initial game board:\n")
-        self.draw_board_to_file(f)
+
+        if board:
+            f.write("4. The initial game board:\n")
+            self.draw_board_to_file(f)
 
     def input_move(self):
         while True:
@@ -682,16 +745,75 @@ class Game:
 
 
 def main():
-    # g = Game(n=4, b=4, s=3, t=5, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], a1=False, a2=False, recommend=True)
-    # g = Game(n=4, b=4, s=3, t=1, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], a1=True, a2=True, recommend=True)
-    # g = Game(n=5, b=4, s=4, t=1, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
-    # g = Game(n=5, b=4, s=4, t=5, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
-    # g = Game(n=8, b=5, s=5, t=1, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
-    # g = Game(n=8, b=5, s=5, t=5, d1=2, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
-    # g = Game(n=8, b=6, s=5, t=1, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
-    g = Game(n=8, b=6, s=5, t=5, d1=6, d2=6, a1=True, a2=True, recommend=True, random_blocks=True)
-    g.play()
+    s = open("scoreboard.txt", "a")
 
+    for i in range(5):
+        g = Game(n=4, b=4, s=3, t=5, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], h1=1, h2=2, a1=False, a2=False, recommend=True)
+        # g = Game(n=4, b=4, s=3, t=1, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], h1=1, h2=2, a1=True, a2=True, recommend=True)
+        # g = Game(n=5, b=4, s=4, t=1, d1=2, d2=6, h1=1, h2=2, a1=True, a2=True, recommend=True, random_blocks=True)
+        # g = Game(n=5, b=4, s=4, t=5, d1=6, d2=6, h1=1, h2=2, a1=True, a2=True, recommend=True, random_blocks=True)
+        # g = Game(n=8, b=5, s=5, t=1, d1=2, d2=6, h1=1, h2=2, a1=True, a2=True, recommend=True, random_blocks=True)
+        # g = Game(n=8, b=5, s=5, t=5, d1=2, d2=6, h1=1, h2=2, a1=True, a2=True, recommend=True, random_blocks=True)
+        # g = Game(n=8, b=6, s=5, t=1, d1=6, d2=6, h1=1, h2=2, a1=True, a2=True, recommend=True, random_blocks=True)
+        # g = Game(n=8, b=6, s=5, t=5, d1=6, d2=6, h1=1, h2=2, a1=True, a2=True, recommend=True, random_blocks=True)
+        if i == 0:
+            g.initial_parameters_to_file(s, board=False)
+
+        g.play()
+        print()
+        print(f"PLAYED {i} GAMES\n")
+        print()
+
+    for i in range(5):
+        g2 = Game(n=4, b=4, s=3, t=5, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], h1=2, h2=1, a1=False, a2=False, recommend=True)
+        # g2 = Game(n=4, b=4, s=3, t=1, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], h1=2, h2=1, a1=True, a2=True, recommend=True)
+        # g2 = Game(n=5, b=4, s=4, t=1, d1=6, d2=2, h1=2, h2=1, a1=True, a2=True, recommend=True, random_blocks=True)
+        # g2 = Game(n=5, b=4, s=4, t=5, d1=6, d2=6, h1=2, h2=1, a1=True, a2=True, recommend=True, random_blocks=True)
+        # g2 = Game(n=8, b=5, s=5, t=1, d1=6, d2=2, h1=2, h2=1, a1=True, a2=True, recommend=True, random_blocks=True)
+        # g2 = Game(n=8, b=5, s=5, t=5, d1=6, d2=2, h1=2, h2=1, a1=True, a2=True, recommend=True, random_blocks=True)
+        # g2 = Game(n=8, b=6, s=5, t=1, d1=6, d2=6, h1=2, h2=1, a1=True, a2=True, recommend=True, random_blocks=True)
+        # g2 = Game(n=8, b=6, s=5, t=5, d1=6, d2=6, h1=2, h2=1, a1=True, a2=True, recommend=True, random_blocks=True)
+        g2.play()
+        print()
+        print(f"PLAYED {i} GAMES\n")
+        print()
+
+    s.write("\n")
+    s.write("10 games \n")
+    s.write("\n")
+
+    # Print wins and win ratios for each heuristic
+    s.write(f"Total wins for heuristic e1: {Game.heuristic1_wins} ({Game.heuristic1_wins/10*100}%)\n")
+    s.write(f"Total wins for heuristic e2: {Game.heuristic2_wins} ({Game.heuristic2_wins / 10 * 100}%)\n")
+    s.write("\n")
+
+    # Print out averaged metrics over 10 games
+    times = Game.scoreboard_evaluation_times
+    s.write(f"i   Average evaluation time: {sum(times)/len(times)}s\n")
+
+    total_evaluations = Game.scoreboard_total_evaluations
+    s.write(f"ii  Total heuristic evaluations: {sum(total_evaluations)}\n")
+    s.write(f"    Average Total heuristic evaluations: {sum(total_evaluations)/len(total_evaluations)}\n")
+
+    evaluations_by_depth = Game.scoreboard_evaluations_by_depth
+    s.write("iii Evaluations by depth: {")
+    for depth in evaluations_by_depth:
+        s.write(f" {depth}:{sum(evaluations_by_depth[depth])},")
+    s.write("}\n")
+    s.write("    Average evaluations by depth: {")
+    for depth in evaluations_by_depth:
+        s.write(f" {depth}:{sum(evaluations_by_depth[depth])/len(evaluations_by_depth[depth])},")
+    s.write("}\n")
+
+    depths = Game.scoreboard_depths
+    s.write(f"iv  Average evaluation depth: {sum(depths) / len(depths)}\n")
+
+    recursion_depth = Game.scoreboard_recursion_depth
+    s.write(f"v   Average recursion depth: {sum(recursion_depth) / len(recursion_depth)}\n")
+
+    moves = Game.scoreboard_moves_per_game
+    s.write(f"vi  Average moves per game: {sum(moves)/len(moves)}\n")
+    s.write("\n")
 
 if __name__ == "__main__":
     main()

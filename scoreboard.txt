@@ -1,0 +1,198 @@
+1. The size n of the board is 4, the number of blocks b is 4, the number of connected pieces s is 3 and the maximum time for evaluation t is 5 
+2. The positions of the blocks are: 
+(x,y) = (A, 0)
+(x,y) = (D, 0)
+(x,y) = (A, 3)
+(x,y) = (D, 3)
+3. Player configurations:
+Player 1 is an AI. The maximum depth is 6. The algorithm is minimax and the heuristic used was heuristic 1
+Player 2 is an AI. The maximum depth is 6. The algorithm is minimax and the heuristic used was heuristic 2
+
+10 games 
+
+Total wins for heuristic e1: 5 (50.0%)
+Total wins for heuristic e2: 4 (40.0%)
+
+i   Average evaluation time: 7.30792093341675e-05s
+ii  Total heuristic evaluations: 4441523
+    Average Total heuristic evaluations: 444152.3
+iii Evaluations by depth: { 6:4439994, 5:267, 4:225, 3:316, 2:262, 1:459,}
+    Average evaluations by depth: { 6:221999.7, 5:13.35, 4:11.25, 3:15.8, 2:13.1, 1:22.95,}
+iv  Average evaluation depth: 5.999086206603557
+v   Average recursion depth: 3.096191095667331
+vi  Average moves per game: 8.8
+
+1. The size n of the board is 4, the number of blocks b is 4, the number of connected pieces s is 3 and the maximum time for evaluation t is 1 
+2. The positions of the blocks are: 
+(x,y) = (A, 0)
+(x,y) = (D, 0)
+(x,y) = (A, 3)
+(x,y) = (D, 3)
+3. Player configurations:
+Player 1 is an AI. The maximum depth is 6. The algorithm is alphabeta and the heuristic used was heuristic 1
+Player 2 is an AI. The maximum depth is 6. The algorithm is alphabeta and the heuristic used was heuristic 2
+
+10 games 
+
+Total wins for heuristic e1: 7 (70.0%)
+Total wins for heuristic e2: 2 (20.0%)
+
+i   Average evaluation time: 7.237746179727189e-05s
+ii  Total heuristic evaluations: 59983
+    Average Total heuristic evaluations: 5998.3
+iii Evaluations by depth: { 6:59983,}
+    Average evaluations by depth: { 6:2999.15,}
+iv  Average evaluation depth: 6.0
+v   Average recursion depth: 6.0
+vi  Average moves per game: 9.2
+
+1. The size n of the board is 5, the number of blocks b is 4, the number of connected pieces s is 4 and the maximum time for evaluation t is 1 
+2. The positions of the blocks are: 
+(x,y) = (E, 1)
+(x,y) = (C, 2)
+(x,y) = (B, 2)
+(x,y) = (A, 1)
+3. Player configurations:
+Player 1 is an AI. The maximum depth is 2. The algorithm is alphabeta and the heuristic used was heuristic 1
+Player 2 is an AI. The maximum depth is 6. The algorithm is alphabeta and the heuristic used was heuristic 2
+
+10 games 
+
+Total wins for heuristic e1: 5 (50.0%)
+Total wins for heuristic e2: 2 (20.0%)
+
+i   Average evaluation time: 9.26636083561025e-05s
+ii  Total heuristic evaluations: 273569
+    Average Total heuristic evaluations: 27356.9
+iii Evaluations by depth: { 2:1123, 6:272424, 5:9, 3:8, 1:2, 4:3,}
+    Average evaluations by depth: { 2:102.0909090909091, 6:27242.4, 5:9.0, 3:8.0, 1:2.0, 4:3.0,}
+iv  Average evaluation depth: 3.9999664420674153
+v   Average recursion depth: 3.996163960318961
+vi  Average moves per game: 18.4
+
+1. The size n of the board is 5, the number of blocks b is 4, the number of connected pieces s is 4 and the maximum time for evaluation t is 5 
+2. The positions of the blocks are: 
+(x,y) = (A, 1)
+(x,y) = (C, 0)
+(x,y) = (E, 2)
+(x,y) = (B, 3)
+3. Player configurations:
+Player 1 is an AI. The maximum depth is 6. The algorithm is alphabeta and the heuristic used was heuristic 1
+Player 2 is an AI. The maximum depth is 6. The algorithm is alphabeta and the heuristic used was heuristic 2
+
+10 games 
+
+Total wins for heuristic e1: 4 (40.0%)
+Total wins for heuristic e2: 2 (20.0%)
+
+i   Average evaluation time: 9.245855651437038e-05s
+ii  Total heuristic evaluations: 554975
+    Average Total heuristic evaluations: 55497.5
+iii Evaluations by depth: { 6:554975,}
+    Average evaluations by depth: { 6:27748.75,}
+iv  Average evaluation depth: 6.0
+v   Average recursion depth: 6.0
+vi  Average moves per game: 19.3
+
+1. The size n of the board is 8, the number of blocks b is 5, the number of connected pieces s is 5 and the maximum time for evaluation t is 1 
+2. The positions of the blocks are: 
+(x,y) = (E, 0)
+(x,y) = (C, 2)
+(x,y) = (F, 2)
+(x,y) = (B, 7)
+(x,y) = (G, 7)
+3. Player configurations:
+Player 1 is an AI. The maximum depth is 2. The algorithm is alphabeta and the heuristic used was heuristic 1
+Player 2 is an AI. The maximum depth is 6. The algorithm is alphabeta and the heuristic used was heuristic 2
+
+10 games 
+
+Total wins for heuristic e1: 5 (50.0%)
+Total wins for heuristic e2: 5 (50.0%)
+
+i   Average evaluation time: 0.00040014395685862233s
+ii  Total heuristic evaluations: 486033
+    Average Total heuristic evaluations: 48603.3
+iii Evaluations by depth: { 2:11829, 6:465727, 5:1747, 3:1530, 1:3545, 4:1655,}
+    Average evaluations by depth: { 2:788.6, 6:46572.7, 5:349.4, 3:306.0, 1:709.0, 4:331.0,}
+iv  Average evaluation depth: 3.954857798185512
+v   Average recursion depth: 2.0315691270058833
+vi  Average moves per game: 43.2
+
+1. The size n of the board is 8, the number of blocks b is 5, the number of connected pieces s is 5 and the maximum time for evaluation t is 5 
+2. The positions of the blocks are: 
+(x,y) = (E, 7)
+(x,y) = (H, 7)
+(x,y) = (G, 0)
+(x,y) = (A, 6)
+(x,y) = (G, 5)
+3. Player configurations:
+Player 1 is an AI. The maximum depth is 2. The algorithm is alphabeta and the heuristic used was heuristic 1
+Player 2 is an AI. The maximum depth is 6. The algorithm is alphabeta and the heuristic used was heuristic 2
+
+10 games 
+
+Total wins for heuristic e1: 4 (40.0%)
+Total wins for heuristic e2: 6 (60.0%)
+
+i   Average evaluation time: 0.00038596786934260547s
+ii  Total heuristic evaluations: 2202424
+    Average Total heuristic evaluations: 220242.4
+iii Evaluations by depth: { 2:10880, 6:2183431, 5:1838, 3:1818, 1:2918, 4:1539,}
+    Average evaluations by depth: { 2:725.3333333333334, 6:218343.1, 5:367.6, 3:363.6, 1:583.6, 4:307.8,}
+iv  Average evaluation depth: 3.991977291034479
+v   Average recursion depth: 2.507655761753525
+vi  Average moves per game: 41.3
+
+1. The size n of the board is 8, the number of blocks b is 6, the number of connected pieces s is 5 and the maximum time for evaluation t is 1 
+2. The positions of the blocks are: 
+(x,y) = (F, 2)
+(x,y) = (A, 3)
+(x,y) = (G, 1)
+(x,y) = (E, 3)
+(x,y) = (H, 1)
+(x,y) = (A, 4)
+3. Player configurations:
+Player 1 is an AI. The maximum depth is 6. The algorithm is alphabeta and the heuristic used was heuristic 1
+Player 2 is an AI. The maximum depth is 6. The algorithm is alphabeta and the heuristic used was heuristic 2
+
+10 games 
+
+Total wins for heuristic e1: 3 (30.0%)
+Total wins for heuristic e2: 6 (60.0%)
+
+i   Average evaluation time: 0.0003829987366867413s
+ii  Total heuristic evaluations: 1126070
+    Average Total heuristic evaluations: 112607.0
+iii Evaluations by depth: { 6:1100613, 4:3594, 2:7342, 5:3867, 3:3591, 1:7063,}
+    Average evaluations by depth: { 6:55030.65, 4:359.4, 2:734.2, 5:351.54545454545456, 3:359.1, 1:706.3,}
+iv  Average evaluation depth: 5.923466499654946
+v   Average recursion depth: 2.2549818074194143
+vi  Average moves per game: 45.3
+
+1. The size n of the board is 8, the number of blocks b is 6, the number of connected pieces s is 5 and the maximum time for evaluation t is 5 
+2. The positions of the blocks are: 
+(x,y) = (A, 4)
+(x,y) = (D, 7)
+(x,y) = (G, 3)
+(x,y) = (B, 4)
+(x,y) = (A, 6)
+(x,y) = (D, 0)
+3. Player configurations:
+Player 1 is an AI. The maximum depth is 6. The algorithm is alphabeta and the heuristic used was heuristic 1
+Player 2 is an AI. The maximum depth is 6. The algorithm is alphabeta and the heuristic used was heuristic 2
+
+10 games 
+
+Total wins for heuristic e1: 4 (40.0%)
+Total wins for heuristic e2: 3 (30.0%)
+
+i   Average evaluation time: 0.00038263453712142706s
+ii  Total heuristic evaluations: 4726586
+    Average Total heuristic evaluations: 472658.6
+iii Evaluations by depth: { 6:4705636, 4:3606, 2:5468, 5:3321, 3:3247, 1:5308,}
+    Average evaluations by depth: { 6:235281.8, 4:360.6, 2:546.8, 5:332.1, 3:324.7, 1:530.8,}
+iv  Average evaluation depth: 5.986913184309126
+v   Average recursion depth: 3.39472510601865
+vi  Average moves per game: 45.5
+
