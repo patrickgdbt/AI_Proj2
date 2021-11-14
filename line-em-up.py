@@ -154,8 +154,8 @@ class Game:
         else:
             return True
 
-    def is_end(self):
-        sub_matrices = self.get_submatrices(self.current_state)
+    def is_end(self, state):
+        sub_matrices = self.get_submatrices(state)
         for sub in sub_matrices:
             # Diagonal win
             lr_diag = [row[i] for i, row in enumerate(sub)]
@@ -180,7 +180,7 @@ class Game:
         for i in range(0, self.n):
             for j in range(0, self.n):
                 # There's an empty field, we continue the game
-                if (self.current_state[i][j] == '.'):
+                if (state[i][j] == '.'):
                     return None
         # It's a tie!
         return '.'
@@ -192,7 +192,7 @@ class Game:
         return False, None
 
     def check_end(self, f):
-        self.result = self.is_end()
+        self.result = self.is_end(self.current_state)
         # Printing the appropriate message if the game has ended
         if self.result != None:
             if self.result == self.X_PLAYER:
@@ -298,6 +298,11 @@ class Game:
     def e3(self, state):
         start = time.time()
         score = 0
+
+        if self.is_end(state) == self.X_PLAYER:
+            score += 1000
+        elif self.is_end(state) == self.O_PLAYER:
+            score -= 1000
 
         # row
         for row in state:
