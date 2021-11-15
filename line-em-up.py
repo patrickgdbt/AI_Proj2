@@ -417,7 +417,7 @@ class Game:
                 a = max(a, value)
                 if a >= b:
                     break
-            return value, x, y, sum(depth_list)/len(depth_list)
+            return value, x, y, sum(depth_list) / len(depth_list)
         else:
             x = None
             y = None
@@ -432,7 +432,7 @@ class Game:
                 b = min(a, value)
                 if b <= a:
                     break
-            return value, x, y, sum(depth_list)/len(depth_list)
+            return value, x, y, sum(depth_list) / len(depth_list)
 
     def update_depth_visits(self, depth):
         if self.player_turn == self.X_PLAYER:
@@ -494,7 +494,7 @@ class Game:
                     x = column
                     y = row
                     value = v
-            return value, x, y, sum(depth_list)/len(depth_list)
+            return value, x, y, sum(depth_list) / len(depth_list)
         else:
             x = None
             y = None
@@ -506,7 +506,7 @@ class Game:
                     x = column
                     y = row
                     value = v
-            return value, x, y, sum(depth_list)/len(depth_list)
+            return value, x, y, sum(depth_list) / len(depth_list)
 
     def is_terminal_node(self, state):
         full = True
@@ -527,14 +527,20 @@ class Game:
                 start = time.time()
                 if self.player_turn == self.X_PLAYER:
                     if self.algo1 == self.MINIMAX:
-                        (_, x, y, average_recursive_depth) = self.mini_max(self.current_state, self.d1, self.heuristic1, maximum=False, start_time=start)
+                        (_, x, y, average_recursive_depth) = self.mini_max(self.current_state, self.d1, self.heuristic1,
+                                                                           maximum=False, start_time=start)
                     else:
-                        (m, x, y, average_recursive_depth) = self.alpha_beta(self.current_state, self.d1, -1000000, 1000000, self.heuristic1, maximum=False, start_time=start)
+                        (m, x, y, average_recursive_depth) = self.alpha_beta(self.current_state, self.d1, -1000000,
+                                                                             1000000, self.heuristic1, maximum=False,
+                                                                             start_time=start)
                 else:
                     if self.algo2 == self.MINIMAX:
-                        (_, x, y, average_recursive_depth) = self.mini_max(self.current_state, self.d2, self.heuristic2, maximum=True, start_time=start)
+                        (_, x, y, average_recursive_depth) = self.mini_max(self.current_state, self.d2, self.heuristic2,
+                                                                           maximum=True, start_time=start)
                     else:
-                        (m, x, y, average_recursive_depth) = self.alpha_beta(self.current_state, self.d2, -1000000, 1000000, self.heuristic2, maximum=True, start_time=start)
+                        (m, x, y, average_recursive_depth) = self.alpha_beta(self.current_state, self.d2, -1000000,
+                                                                             1000000, self.heuristic2, maximum=True,
+                                                                             start_time=start)
                 end = time.time()
                 self.average_recursive_depth = average_recursive_depth
 
@@ -673,14 +679,18 @@ class Game:
             else:
                 Game.scoreboard_evaluations_by_depth[depth].append(self.total_depth_2[depth])
 
-        f.write(f"6b v) The average of the per move ARD for heuristic 1 is {sum(self.average_recursive_depths1)/len(self.average_recursive_depths1)}\n")
-        Game.scoreboard_recursion_depth.append(sum(self.average_recursive_depths1)/len(self.average_recursive_depths1))
-        f.write(f" The average of the per move ARD for heuristic 2 is {sum(self.average_recursive_depths2) / len(self.average_recursive_depths2)}\n")
-        Game.scoreboard_recursion_depth.append(sum(self.average_recursive_depths2) / len(self.average_recursive_depths2))
+        f.write(
+            f"6b v) The average of the per move ARD for heuristic 1 is {sum(self.average_recursive_depths1) / len(self.average_recursive_depths1)}\n")
+        Game.scoreboard_recursion_depth.append(
+            sum(self.average_recursive_depths1) / len(self.average_recursive_depths1))
+        f.write(
+            f" The average of the per move ARD for heuristic 2 is {sum(self.average_recursive_depths2) / len(self.average_recursive_depths2)}\n")
+        Game.scoreboard_recursion_depth.append(
+            sum(self.average_recursive_depths2) / len(self.average_recursive_depths2))
 
         f.write(
             f"6b vi) The total number of moves made by heuristic 1 is {self.total_moves_1} and the total number of moves made by heuristic 2 is {self.total_moves_2}\n")
-        Game.scoreboard_moves_per_game.append(self.total_moves_1+self.total_moves_2)
+        Game.scoreboard_moves_per_game.append(self.total_moves_1 + self.total_moves_2)
 
     def initial_parameters_to_file(self, f, board=True):
         f.write(f"1. The size n of the board is {self.n}, the number of blocks b is {self.b}, "
@@ -748,7 +758,8 @@ def main():
     s = open("scoreboard.txt", "a")
 
     for i in range(5):
-        g = Game(n=4, b=4, s=3, t=5, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], h1=1, h2=2, a1=False, a2=False, recommend=True)
+        g = Game(n=4, b=4, s=3, t=5, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], h1=1, h2=2, a1=False,
+                 a2=False, recommend=True)
         # g = Game(n=4, b=4, s=3, t=1, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], h1=1, h2=2, a1=True, a2=True, recommend=True)
         # g = Game(n=5, b=4, s=4, t=1, d1=2, d2=6, h1=1, h2=2, a1=True, a2=True, recommend=True, random_blocks=True)
         # g = Game(n=5, b=4, s=4, t=5, d1=6, d2=6, h1=1, h2=2, a1=True, a2=True, recommend=True, random_blocks=True)
@@ -765,7 +776,8 @@ def main():
         print()
 
     for i in range(5):
-        g2 = Game(n=4, b=4, s=3, t=5, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], h1=2, h2=1, a1=False, a2=False, recommend=True)
+        g2 = Game(n=4, b=4, s=3, t=5, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], h1=2, h2=1, a1=False,
+                  a2=False, recommend=True)
         # g2 = Game(n=4, b=4, s=3, t=1, d1=6, d2=6, blocks=[(0, 0), (0, 3), (3, 0), (3, 3)], h1=2, h2=1, a1=True, a2=True, recommend=True)
         # g2 = Game(n=5, b=4, s=4, t=1, d1=6, d2=2, h1=2, h2=1, a1=True, a2=True, recommend=True, random_blocks=True)
         # g2 = Game(n=5, b=4, s=4, t=5, d1=6, d2=6, h1=2, h2=1, a1=True, a2=True, recommend=True, random_blocks=True)
@@ -783,17 +795,17 @@ def main():
     s.write("\n")
 
     # Print wins and win ratios for each heuristic
-    s.write(f"Total wins for heuristic e1: {Game.heuristic1_wins} ({Game.heuristic1_wins/10*100}%)\n")
+    s.write(f"Total wins for heuristic e1: {Game.heuristic1_wins} ({Game.heuristic1_wins / 10 * 100}%)\n")
     s.write(f"Total wins for heuristic e2: {Game.heuristic2_wins} ({Game.heuristic2_wins / 10 * 100}%)\n")
     s.write("\n")
 
     # Print out averaged metrics over 10 games
     times = Game.scoreboard_evaluation_times
-    s.write(f"i   Average evaluation time: {sum(times)/len(times)}s\n")
+    s.write(f"i   Average evaluation time: {sum(times) / len(times)}s\n")
 
     total_evaluations = Game.scoreboard_total_evaluations
     s.write(f"ii  Total heuristic evaluations: {sum(total_evaluations)}\n")
-    s.write(f"    Average Total heuristic evaluations: {sum(total_evaluations)/len(total_evaluations)}\n")
+    s.write(f"    Average Total heuristic evaluations: {sum(total_evaluations) / len(total_evaluations)}\n")
 
     evaluations_by_depth = Game.scoreboard_evaluations_by_depth
     s.write("iii Evaluations by depth: {")
@@ -802,7 +814,7 @@ def main():
     s.write("}\n")
     s.write("    Average evaluations by depth: {")
     for depth in evaluations_by_depth:
-        s.write(f" {depth}:{sum(evaluations_by_depth[depth])/len(evaluations_by_depth[depth])},")
+        s.write(f" {depth}:{sum(evaluations_by_depth[depth]) / len(evaluations_by_depth[depth])},")
     s.write("}\n")
 
     depths = Game.scoreboard_depths
@@ -812,8 +824,9 @@ def main():
     s.write(f"v   Average recursion depth: {sum(recursion_depth) / len(recursion_depth)}\n")
 
     moves = Game.scoreboard_moves_per_game
-    s.write(f"vi  Average moves per game: {sum(moves)/len(moves)}\n")
+    s.write(f"vi  Average moves per game: {sum(moves) / len(moves)}\n")
     s.write("\n")
+
 
 if __name__ == "__main__":
     main()
